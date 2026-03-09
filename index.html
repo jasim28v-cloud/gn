@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VØID_X | INFINITY IONIC PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
+        
+        :root { --neon: #ff007f; --bg: #0d0005; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
+
+        .pink-void-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #200010 0%, #000 100%);
+        }
+
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .scroll-engine::-webkit-scrollbar { display: none; }
+        
+        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        .crystal-frame { width: 100%; height: 100%; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
+        /* العلامة المائية المطورة */
+        .watermark-overlay {
+            position: absolute; top: 20%; left: 10%;
+            font-family: 'Orbitron', sans-serif; font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.3); pointer-events: none; z-index: 20;
+            text-transform: uppercase; letter-spacing: 5px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* أيقونة القلب عند النقر المزدوج */
+        .heart-pop {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; color: var(--neon); opacity: 0; pointer-events: none; z-index: 100;
+        }
+        .heart-animate { animation: pop 0.8s ease-out; }
+        @keyframes pop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+
+        header { position: fixed; top: 25px; right: 25px; z-index: 500; display: flex; align-items: center; gap: 12px; }
+        .brand-box { padding: 8px 20px; border-radius: 15px; border: 1px solid var(--neon); box-shadow: 0 0 15px var(--neon); background: rgba(0,0,0,0.8); }
+        .ionic-clock { font-family: 'Orbitron', sans-serif; font-size: 13px; color: var(--neon); background: rgba(255,0,127,0.1); padding: 8px 15px; border-radius: 15px; border: 1px solid rgba(255,0,127,0.2); }
+
+        .side-actions { position: absolute; left: 22px; bottom: 130px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .action-btn { 
+            width: 58px; height: 58px; border-radius: 50%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; transition: 0.3s; 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+        }
+        .action-btn i { font-size: 22px; transition: 0.3s; }
+        .action-btn:active { transform: scale(0.9); border-color: var(--neon); color: var(--neon); }
+
+        nav { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 400px; height: 75px; border-radius: 35px; 
+            background: rgba(10,0,5,0.85); backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255,0,127,0.3); display: flex; justify-content: space-around; align-items: center; z-index: 200; 
+        }
+
+        #upload-trigger { background: var(--neon); box-shadow: 0 0 20px var(--neon); }
+
+        #chat-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(10,0,5,0.98); display: none; flex-direction: column; padding: 30px; }
+        .admin-panel { position: fixed; inset: 0; z-index: 999; background: #000; display: none; flex-direction: column; padding: 40px 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="pink-void-bg"></div>
+
+    <header>
+        <div class="brand-box"><span class="brand-name" style="text-shadow: 0 0 10px var(--neon);">VØID_X</span></div>
+        <div class="ionic-clock" id="clock">00:00:00</div>
+    </header>
+
+    <main class="scroll-engine" id="video-stack"></main>
+
+    <nav>
+        <i class="fas fa-th-large text-white/30 text-xl"></i>
+        <div id="upload-trigger" class="w-16 h-12 text-white rounded-[20px] flex items-center justify-center cursor-pointer">
+            <i class="fas fa-plus"></i>
+        </div>
+        <i class="fas fa-comment-dots text-white/30 text-xl cursor-pointer" onclick="toggleChat()"></i>
+    </nav>
+
+    <div id="chat-overlay">... (Chat UI) ...</div>
+
+    <script>
+        const ADMIN_PASS = "1234";
+        // روابط الإعلانات الخاصة بك
+        const AD_LINKS = [
+            "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c", 
+            "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
+        ];
+        let currentAd = 0;
+        const USR_ID = "ION-" + Math.floor(Math.random()*999);
+
+        const firebaseConfig = { databaseURL: "https://goms-8fdfd-default-rtdb.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
+        setInterval(updateClock, 1000);
+
+        function triggerAd() { 
+            window.open(AD_LINKS[currentAd], '_blank'); 
+            currentAd = (currentAd + 1) % AD_LINKS.length; 
+        }
+
+        db.ref('videos').on('value', (snap) => {
+            const container = document.getElementById('video-stack');
+            const data = snap.val();
+            container.innerHTML = '';
+            if(!data) return;
+            
+            Object.keys(data).reverse().forEach((id) => {
+                const vid = data[id];
+                const section = document.createElement('section');
+                section.className = 'video-segment';
+                section.innerHTML = `
+                    <div class="crystal-frame">
+                        <div class="watermark-overlay">VØID_X PRO</div>
+                        <i class="fas fa-heart heart-pop" id="heart-${id}"></i>
+                        <video loop playsinline src="${vid.url}" 
+                               onclick="handleVideoTap(this, '${id}')" 
+                               oncontextmenu="return false;"></video>
+                        <div class="side-actions">
+                            <div class="action-btn" style="border-color:#ffaa00; color:#ffaa00" onclick="checkAdmin()">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <div class="action-btn" onclick="likeVideo('${id}')">
+                                <i class="fas fa-bolt" style="color:var(--neon)"></i>
+                                <span class="text-[10px] font-bold">${vid.likes || 0}</span>
+                            </div>
+                            <div class="action-btn" onclick="toggleChat()">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="action-btn" onclick="shareVideo()">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+            initObserver();
+        });
+
+        // نظام النقر المزدوج والتحكم بالفيديو
+        let lastTap = 0;
+        function handleVideoTap(v, id) {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                // Double Tap Action
+                likeVideo(id);
+                const h = document.getElementById(`heart-${id}`);
+                h.classList.add('heart-animate');
+                setTimeout(() => h.classList.remove('heart-animate'), 800);
+            } else {
+                // Single Tap
+                v.paused ? v.play() : v.pause();
+            }
+            lastTap = now;
+        }
+
+        function likeVideo(id) {
+            triggerAd(); // فتح الإعلان عند الإعجاب
+            db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1);
+        }
+
+        function shareVideo() {
+            triggerAd(); // فتح الإعلان عند المشاركة
+            if (navigator.share) {
+                navigator.share({ title: 'VØID_X', url: window.location.href });
+            }
+        }
+
+        // ... بقية دوال Firebase والـ Widget (تبقى كما هي في الكود الأصلي) ...
+        
+        function initObserver() {
+            const colors = ['#ff007f', '#00f3ff', '#00ffaa', '#ffaa00', '#7000ff'];
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(e.isIntersecting) {
+                        v.play().catch(()=>{});
+                        document.documentElement.style.setProperty('--neon', colors[Math.floor(Math.random()*colors.length)]);
+                    } else { v.pause(); }
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
+        }
+    </script>
+</body>
+</html>
