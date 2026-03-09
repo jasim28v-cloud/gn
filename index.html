@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VØID_X | INFINITY IONIC PRO</title>
+    <title>VØID_X | NEON SUPREME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,12 +12,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         
-        :root { --neon: #ff007f; --bg: #0d0005; }
+        :root { --neon: #ff007f; --bg: #050002; }
         body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
 
+        /* خلفية الفضاء العميق */
         .pink-void-bg {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #200010 0%, #000 100%);
+            background: radial-gradient(circle at 50% 50%, #1a000d 0%, #000 100%);
         }
 
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
@@ -27,59 +28,64 @@
         .crystal-frame { width: 100%; height: 100%; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
+        /* العلامة المائية الأيونية */
         .watermark-overlay {
-            position: absolute; top: 15%; left: 10%;
-            font-family: 'Orbitron', sans-serif; font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.2); pointer-events: none; z-index: 20;
-            text-transform: uppercase; letter-spacing: 4px;
-            animation: float 5s ease-in-out infinite;
+            position: absolute; top: 12%; right: 8%;
+            font-family: 'Orbitron', sans-serif; font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 20;
+            letter-spacing: 5px; animation: pulse 4s infinite;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
 
+        /* القلب المتوهج */
         .heart-pop {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5rem; color: var(--neon); opacity: 0; pointer-events: none; z-index: 100;
+            font-size: 6rem; color: var(--neon); opacity: 0; pointer-events: none; z-index: 100;
+            filter: drop-shadow(0 0 20px var(--neon));
         }
-        .heart-animate { animation: pop 0.8s ease-out; }
-        @keyframes pop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+        .heart-animate { animation: ionic-pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes ionic-pop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } }
 
-        header { position: fixed; top: 25px; right: 25px; z-index: 500; display: flex; align-items: center; gap: 12px; }
-        .brand-box { padding: 8px 20px; border-radius: 15px; border: 1px solid var(--neon); box-shadow: 0 0 15px var(--neon); background: rgba(0,0,0,0.8); }
-        .ionic-clock { font-family: 'Orbitron', sans-serif; font-size: 13px; color: var(--neon); background: rgba(255,0,127,0.1); padding: 8px 15px; border-radius: 15px; border: 1px solid rgba(255,0,127,0.2); }
+        header { position: fixed; top: 30px; left: 30px; right: 30px; z-index: 500; display: flex; justify-content: space-between; align-items: center; }
+        .brand-box { padding: 10px 25px; border-radius: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-left: 3px solid var(--neon); box-shadow: -5px 0 15px -5px var(--neon); transition: 0.5s; }
+        .brand-name { font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 2px; font-size: 1.1rem; }
+        .ionic-clock { font-family: 'Orbitron', sans-serif; font-size: 12px; color: var(--neon); opacity: 0.8; }
 
-        /* رفع الأزرار الجانبية للأعلى قليلاً لتجنب التداخل مع الشريط السفلي */
-        .side-actions { position: absolute; left: 22px; bottom: 160px; display: flex; flex-direction: column; gap: 18px; z-index: 100; }
+        /* الأزرار الجانبية المرفوعة */
+        .side-actions { position: absolute; left: 25px; bottom: 180px; display: flex; flex-direction: column; gap: 22px; z-index: 100; }
         .action-btn { 
-            width: 58px; height: 58px; border-radius: 20px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; transition: 0.3s; 
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); color: var(--neon);
+            width: 62px; height: 62px; border-radius: 22px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); color: #fff;
         }
-        .admin-btn { border-color: #ffaa00 !important; color: #ffaa00 !important; }
+        .action-btn i { font-size: 1.4rem; transition: 0.3s; color: var(--neon); }
+        .action-btn:active { transform: scale(0.85); background: var(--neon); }
+        .btn-label { font-size: 10px; font-weight: bold; margin-top: 4px; font-family: 'Orbitron'; opacity: 0.7; }
 
-        /* الشريط السفلي المطور مع ميزة البصمة */
+        /* الشريط السفلي الأيوني المطور */
         nav { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            width: 88%; max-width: 400px; height: 75px; border-radius: 35px; 
-            background: rgba(10,0,5,0.85); backdrop-filter: blur(25px); 
-            border: 1px solid var(--neon); display: flex; justify-content: space-around; align-items: center; z-index: 200; 
-            box-shadow: 0 0 20px -5px var(--neon);
+            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 420px; height: 80px; border-radius: 40px; 
+            background: rgba(5,0,2,0.85); backdrop-filter: blur(30px); 
+            border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 200; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px -5px var(--neon); transition: 0.5s;
         }
 
-        .fingerprint-icon { color: rgba(255, 255, 255, 0.2); font-size: 1.5rem; transition: 0.5s; }
-        .fingerprint-active { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        .finger-shell { 
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(255,255,255,0.05); color: var(--neon);
+            box-shadow: inset 0 0 10px rgba(255,0,127,0.1); animation: breathe 3s infinite;
+        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 1; } }
 
         #upload-trigger { 
-            background: var(--neon); 
-            box-shadow: 0 0 25px var(--neon); 
-            cursor: pointer; 
-            width: 65px; height: 65px;
-            border-radius: 25px;
-            display: flex; align-items: center; justify-content: center;
-            transform: translateY(-5px);
+            background: var(--neon); box-shadow: 0 0 30px var(--neon); cursor: pointer; 
+            width: 68px; height: 68px; border-radius: 25px; display: flex; align-items: center; justify-content: center;
+            transform: translateY(-15px); border: 4px solid var(--bg); transition: 0.3s;
         }
+        #upload-trigger:active { transform: translateY(-10px) scale(0.9); }
 
-        #chat-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(10,0,5,0.98); display: none; flex-direction: column; padding: 30px; }
-        .admin-panel { position: fixed; inset: 0; z-index: 999; background: #000; display: none; flex-direction: column; padding: 40px 20px; }
+        #chat-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.95); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(20px); }
     </style>
 </head>
 <body>
@@ -87,48 +93,38 @@
     <div class="pink-void-bg"></div>
 
     <header>
-        <div class="brand-box"><span class="brand-name">VØID_X</span></div>
+        <div class="brand-box"><span class="brand-name text-white">VØID<span style="color:var(--neon)">_X</span></span></div>
         <div class="ionic-clock" id="clock">00:00:00</div>
     </header>
 
     <main class="scroll-engine" id="video-stack"></main>
 
-    <nav id="main-nav">
-        <i class="fas fa-fingerprint fingerprint-icon fingerprint-active"></i>
-        
-        <div id="upload-trigger" class="active:scale-90 transition-transform">
+    <nav>
+        <div class="finger-shell"><i class="fas fa-fingerprint text-2xl"></i></div>
+        <div id="upload-trigger">
             <i class="fas fa-plus text-2xl text-white"></i>
         </div>
-        
-        <i class="fas fa-comment-alt text-xl" style="color: var(--neon);" onclick="toggleChat()"></i>
+        <div class="finger-shell" onclick="toggleChat()" style="color: #fff; opacity: 0.4;"><i class="fas fa-comment-dots text-2xl"></i></div>
     </nav>
 
     <div id="chat-overlay">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-pink-500">IONIC_CHAT</h2>
-            <i class="fas fa-times text-white/50 text-xl" onclick="toggleChat()"></i>
-        </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto"></div>
-        <div class="mt-4 flex gap-3 p-2 bg-white/5 rounded-2xl border border-pink-500/20">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Write pulse...">
-            <button onclick="sendMsg()" class="bg-pink-600 px-6 rounded-xl">SEND</button>
-        </div>
-    </div>
-
-    <div id="admin-overlay" class="admin-panel">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Orbitron] text-[#ffaa00]">TERMINAL_VOID</h2>
-            <button onclick="toggleAdmin()" class="bg-white/10 px-8 py-2 rounded-full">CLOSE</button>
+            <h2 class="font-[Orbitron] text-2xl tracking-widest" style="color:var(--neon)">IONIC_CHAT</h2>
+            <i class="fas fa-circle-xmark text-white/30 text-3xl" onclick="toggleChat()"></i>
         </div>
-        <div id="admin-list" class="space-y-4 overflow-y-auto"></div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
+        <div class="mt-6 flex gap-3 bg-white/5 p-3 rounded-3xl border border-white/10">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Type a pulse...">
+            <button onclick="sendMsg()" class="bg-pink-600 w-12 h-12 rounded-2xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+        </div>
     </div>
 
     <script>
-        const ADMIN_PASS = "1234";
         const AD_LINKS = ["https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c", "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"];
         let currentAd = 0;
         const USR_ID = "ION-" + Math.floor(Math.random()*999);
 
+        // Firebase (بياناتك محفوظة)
         const firebaseConfig = { databaseURL: "https://goms-8fdfd-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -138,9 +134,8 @@
 
         db.ref('videos').on('value', (snap) => {
             const container = document.getElementById('video-stack');
-            const adminList = document.getElementById('admin-list');
             const data = snap.val();
-            container.innerHTML = ''; adminList.innerHTML = '';
+            container.innerHTML = '';
             if(!data) return;
             
             Object.keys(data).reverse().forEach((id) => {
@@ -149,27 +144,26 @@
                 section.className = 'video-segment';
                 section.innerHTML = `
                     <div class="crystal-frame">
-                        <div class="watermark-overlay">VØID_X SUPREME</div>
+                        <div class="watermark-overlay">SYSTEM_VØID_SUPREME</div>
                         <i class="fas fa-heart heart-pop" id="heart-${id}"></i>
                         <video loop playsinline src="${vid.url}" onclick="handleTap(this, '${id}')"></video>
                         <div class="side-actions">
-                            <div class="action-btn admin-btn" onclick="checkAdmin()"><i class="fas fa-fingerprint"></i></div>
                             <div class="action-btn" onclick="likeVideo('${id}')">
                                 <i class="fas fa-bolt"></i>
-                                <span class="text-[10px] mt-1 font-black">${vid.likes || 0}</span>
+                                <span class="btn-label">${vid.likes || 0}</span>
                             </div>
-                            <div class="action-btn" onclick="toggleChat()"><i class="fas fa-terminal"></i></div>
-                            <div class="action-btn" onclick="shareVideo()"><i class="fas fa-share-nodes"></i></div>
+                            <div class="action-btn" onclick="toggleChat()">
+                                <i class="fas fa-terminal"></i>
+                                <span class="btn-label">CHAT</span>
+                            </div>
+                            <div class="action-btn" onclick="shareVideo()">
+                                <i class="fas fa-share-nodes"></i>
+                                <span class="btn-label">SEND</span>
+                            </div>
                         </div>
                     </div>
                 `;
                 container.appendChild(section);
-
-                adminList.innerHTML += `<div class="flex items-center gap-4 p-4 bg-white/5 rounded-3xl">
-                    <video class="w-14 h-14 rounded-xl object-cover" src="${vid.url}"></video>
-                    <div class="flex-1 text-[10px] font-[Orbitron] opacity-40">${id}</div>
-                    <i class="fas fa-trash-alt text-red-500 p-2" onclick="if(confirm('حذف؟')) db.ref('videos/${id}').remove()"></i>
-                </div>`;
             });
             initObserver();
         });
@@ -189,27 +183,29 @@
         function likeVideo(id) { triggerAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function shareVideo() { triggerAd(); if(navigator.share) navigator.share({url: window.location.href}); }
         function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ACCESS CODE:")===ADMIN_PASS) toggleAdmin(); }
-        function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display==='flex'?'none':'flex'; }
 
         function sendMsg() {
             const inp = document.getElementById('msg-input');
             if(inp.value.trim()){ db.ref('chat').push({user:USR_ID, text:inp.value}); inp.value=''; }
         }
 
-        db.ref('chat').limitToLast(20).on('value', s => {
+        db.ref('chat').limitToLast(15).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
             s.forEach(m => {
                 const d = m.val();
-                box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl mb-3 border border-pink-500/10"><span class="text-[9px] text-pink-500 block mb-1 font-[Orbitron]">${d.user}</span><p class="text-sm">${d.text}</p></div>`;
+                box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border-l-2 border-pink-500/30">
+                    <span class="text-[10px] text-pink-500 font-bold block mb-1 uppercase tracking-tighter">${d.user}</span>
+                    <p class="text-sm text-white/80">${d.text}</p>
+                </div>`;
             });
             box.scrollTop = box.scrollHeight;
         });
 
+        // الرفع (Cloudinary) - بدون مساس
         const myWidget = cloudinary.createUploadWidget({ 
             cloudName: "dpcysggzh", uploadPreset: "poro_go",
             maxFiles: 1, clientAllowedFormats: ["mp4", "mov", "webm"],
-            styles: { palette: { window: "#0d0005", sourceBg: "#0d0005", windowBorder: "#ff007f", tabIcon: "#ff007f", menuIcons: "#ff007f", link: "#ff007f", action: "#ff007f", inProgress: "#ff007f", complete: "#20ff88", textLight: "#ffffff" } }
+            styles: { palette: { window: "#050002", sourceBg: "#050002", windowBorder: "#ff007f", tabIcon: "#ff007f", menuIcons: "#ff007f", link: "#ff007f", action: "#ff007f", inProgress: "#ff007f", complete: "#20ff88", textLight: "#ffffff" } }
         }, (err, res) => {
             if (!err && res.event === "success") db.ref('videos/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
@@ -222,7 +218,8 @@
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
                         v.play().catch(()=>{});
-                        document.documentElement.style.setProperty('--neon', colors[Math.floor(Math.random()*colors.length)]);
+                        const clr = colors[Math.floor(Math.random()*colors.length)];
+                        document.documentElement.style.setProperty('--neon', clr);
                     } else { v.pause(); }
                 });
             }, { threshold: 0.8 });
