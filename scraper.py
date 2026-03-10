@@ -7,7 +7,7 @@ def run_velss():
     # الرابط الإعلاني الخاص بك
     my_ad_link = "https://data527.click/21330bf1d025d41336e6/57154ac610/?placementName=default"
     
-    # الرؤوس (Headers) التي طلبت وضعها بدقة
+    # الرؤوس المتطورة التي طلبتها لضمان عدم الحظر
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,video/*;q=0.9,*/*;q=0.8',
@@ -27,9 +27,9 @@ def run_velss():
     }
     
     try:
-        # جلب البيانات باستخدام الرؤوس الجديدة
         response = requests.get(url, headers=headers, timeout=20)
-        links = re.findall(r'(?:vless|vmess|trojan|ss)://[^\s<"\'\s]+', response.text)
+        # النمط المطور ليشمل exclave وباقي البروتوكولات
+        links = re.findall(r'(?:exclave|vless|vmess|trojan|ss)://[^\s<"\'\s]+', response.text)
         
         clean_links = []
         for l in links:
@@ -72,7 +72,7 @@ def run_velss():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>velss - Ultimate Network</title>
+    <title>velss - Ultimate Protection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -86,7 +86,6 @@ def run_velss():
         #bridge-page {{ display: none; background: rgba(255,255,255,0.98); z-index: 9999; }}
         @keyframes fadeIn {{ from {{ opacity: 0; transform: scale(0.95); }} to {{ opacity: 1; transform: scale(1); }} }}
         .animate-fade-in {{ animation: fadeIn 0.4s ease-out; }}
-        .no-scrollbar {{ -ms-overflow-style: none; scrollbar-width: none; }}
         .no-scrollbar::-webkit-scrollbar {{ display: none; }}
     </style>
 </head>
@@ -95,7 +94,7 @@ def run_velss():
     <div id="bridge-page" class="fixed inset-0 flex flex-col items-center justify-center text-center p-6">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 mb-4"></div>
         <h2 class="text-2xl font-black mb-2 text-slate-800">جاري فحص وتأمين الرابط...</h2>
-        <p class="text-gray-500">يرجى الانتظار قليلاً للحصول على أفضل أداء</p>
+        <p class="text-gray-500">يرجى الانتظار قليلاً للحصول على أفضل أداء عبر velss</p>
     </div>
 
     <nav class="flex justify-between items-center px-6 py-5 max-w-6xl mx-auto border-b border-gray-100 bg-white sticky top-0 z-40">
@@ -111,7 +110,7 @@ def run_velss():
 
     <section class="px-6 py-12 text-center max-w-4xl mx-auto bg-white rounded-b-[40px] shadow-sm mb-8">
         <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-4 gradient-text">خادم velss ذكي</h1>
-        <p class="text-gray-400 text-sm mb-8">سيرفرات محدثة بأحدث التقنيات وأفضل سرعة استجابة.</p>
+        <p class="text-gray-400 text-sm mb-8">سيرفرات مطورة تدعم exclave بأفضل سرعة استجابة.</p>
         <div class="ad-click" onclick="triggerBridge()"><img src="https://cdni.iconscout.com/illustration/premium/thumb/network-infrastructure-4437294-3684813.png" class="w-64 mx-auto"></div>
     </section>
 
@@ -119,39 +118,43 @@ def run_velss():
 
     <div class="flex overflow-x-auto gap-2 px-6 mb-8 max-w-2xl mx-auto no-scrollbar">
         <button onclick="filterServers('ALL', this)" class="filter-btn active whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 text-xs font-bold shadow-sm transition-all">الكل</button>
-        <button onclick="filterServers('VMESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VMESS</button>
+        <button onclick="filterServers('EXCLAVE', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">EXCLAVE</button>
         <button onclick="filterServers('VLESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VLESS</button>
-        <button onclick="filterServers('TROJAN', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">TROJAN</button>
-        <button onclick="filterServers('SS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">Shadowsocks</button>
+        <button onclick="filterServers('VMESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VMESS</button>
     </div>
 
     <main class="max-w-xl mx-auto px-6">
         <div class="flex flex-col mb-10">
             <div class="flex items-center justify-between mb-2">
-                <h2 class="font-black text-xl text-slate-800">سيرفرات اليوم</h2>
+                <h2 class="font-black text-xl text-slate-800">سيرفرات velss اليوم</h2>
                 <span class="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-full text-[10px] font-bold border border-indigo-100 uppercase tracking-widest">{now}</span>
             </div>
             <p class="text-[11px] text-gray-400 leading-relaxed text-right border-r-2 border-indigo-200 pr-3">
                 يتم جلب البيانات وتحديثها تلقائياً لضمان استقرار الاتصال وحماية الخصوصية.
                 <br>
-                <span class="text-indigo-300 uppercase">Premium Nodes globally collected by velss.</span>
+                <span class="text-indigo-300 uppercase">Premium velss Nodes globally collected.</span>
             </p>
         </div>
         
-        <div id="servers-container">{{server_cards}}</div>
+        <div id="servers-container">{server_cards}</div>
     </main>
 
+    <section class="max-w-xl mx-auto px-6 mt-16 text-right">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm space-y-8">
+            <div>
+                <h3 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-file-contract text-indigo-500"></i> الشروط والأحكام
+                </h3>
+                <p class="text-xs text-gray-500 leading-loose">
+                    تحدد هذه الشروط والأحكام قواعد استخدام موقع velss الإلكتروني. بدخولك إلى هذا الموقع، فإننا نفترض موافقتك على هذه الشروط.
+                    <span class="text-indigo-500 font-bold ad-click" onclick="triggerBridge()">اقرأ المزيد</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-slate-950 mt-20 pt-16 pb-10 px-6 text-center text-white relative">
-        <div class="absolute -top-10 left-0 w-full overflow-hidden leading-none rotate-180">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-10 fill-slate-950">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-            </svg>
-        </div>
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-4 italic">© velss.com. جميع الحقوق محفوظة.</p>
-        <div class="flex justify-center gap-6 text-indigo-400 font-bold text-xs">
-            <span class="ad-click" onclick="triggerBridge()">Privacy Policy</span>
-            <span class="ad-click" onclick="triggerBridge()">Contact Us</span>
-        </div>
     </footer>
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 transition-all pointer-events-none z-50">تمت العملية بنجاح! ✅</div>
@@ -184,7 +187,7 @@ def run_velss():
         function startCountdown() {{
             let h = 5, m = 59, s = 59;
             setInterval(() => {{
-                if(s > 0) s--; else {{ s = 59; if(m > 0) m--; else {{ m = 59; h--; }} }}
+                s--; if(s<0){{s=59; m--;}} if(m<0){{m=59; h--;}}
                 document.getElementById('countdown').innerText = String(h).padStart(2,'0')+":"+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
             }}, 1000);
         }}
@@ -210,10 +213,9 @@ def run_velss():
         
         with open("index.html", "w", encoding="utf-8") as f:
             f.write(html)
-        print("✅ [velss] تم التحديث بنجاح باستخدام الرؤوس الجديدة!")
+        print("✅ [velss] تم التحديث بنجاح: يدعم exclave والرؤوس المتطورة!")
             
-    except Exception as e:
-        print(f"Error: {e}")
+    except Exception as e: print(f"Error: {e}")
 
 if __name__ == "__main__":
     run_velss()
