@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>velss - Ultimate Network</title>
+    <title>velss - Ultimate Protection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,6 @@
         #bridge-page { display: none; background: rgba(255,255,255,0.98); z-index: 9999; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -26,7 +25,7 @@
     <div id="bridge-page" class="fixed inset-0 flex flex-col items-center justify-center text-center p-6">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 mb-4"></div>
         <h2 class="text-2xl font-black mb-2 text-slate-800">جاري فحص وتأمين الرابط...</h2>
-        <p class="text-gray-500">يرجى الانتظار قليلاً للحصول على أفضل أداء</p>
+        <p class="text-gray-500">يرجى الانتظار قليلاً للحصول على أفضل أداء عبر velss</p>
     </div>
 
     <nav class="flex justify-between items-center px-6 py-5 max-w-6xl mx-auto border-b border-gray-100 bg-white sticky top-0 z-40">
@@ -42,7 +41,7 @@
 
     <section class="px-6 py-12 text-center max-w-4xl mx-auto bg-white rounded-b-[40px] shadow-sm mb-8">
         <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-4 gradient-text">خادم velss ذكي</h1>
-        <p class="text-gray-400 text-sm mb-8">سيرفرات محدثة بأحدث التقنيات وأفضل سرعة استجابة.</p>
+        <p class="text-gray-400 text-sm mb-8">سيرفرات مطورة تدعم exclave بأفضل سرعة استجابة.</p>
         <div class="ad-click" onclick="triggerBridge()"><img src="https://cdni.iconscout.com/illustration/premium/thumb/network-infrastructure-4437294-3684813.png" class="w-64 mx-auto"></div>
     </section>
 
@@ -55,39 +54,383 @@
 
     <div class="flex overflow-x-auto gap-2 px-6 mb-8 max-w-2xl mx-auto no-scrollbar">
         <button onclick="filterServers('ALL', this)" class="filter-btn active whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 text-xs font-bold shadow-sm transition-all">الكل</button>
-        <button onclick="filterServers('VMESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VMESS</button>
+        <button onclick="filterServers('EXCLAVE', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">EXCLAVE</button>
         <button onclick="filterServers('VLESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VLESS</button>
-        <button onclick="filterServers('TROJAN', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">TROJAN</button>
-        <button onclick="filterServers('SS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">Shadowsocks</button>
+        <button onclick="filterServers('VMESS', this)" class="filter-btn whitespace-nowrap px-6 py-2 rounded-full border border-indigo-100 bg-white text-xs font-bold shadow-sm transition-all">VMESS</button>
     </div>
 
     <main class="max-w-xl mx-auto px-6">
         <div class="flex flex-col mb-10">
             <div class="flex items-center justify-between mb-2">
-                <h2 class="font-black text-xl text-slate-800">سيرفرات اليوم</h2>
+                <h2 class="font-black text-xl text-slate-800">سيرفرات velss اليوم</h2>
                 <span class="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-full text-[10px] font-bold border border-indigo-100 uppercase tracking-widest">2026-03-10</span>
             </div>
             <p class="text-[11px] text-gray-400 leading-relaxed text-right border-r-2 border-indigo-200 pr-3">
                 يتم جلب البيانات وتحديثها تلقائياً لضمان استقرار الاتصال وحماية الخصوصية.
                 <br>
-                <span class="text-indigo-300 uppercase">Premium Nodes globally collected by velss.</span>
+                <span class="text-indigo-300 uppercase">Premium velss Nodes globally collected.</span>
             </p>
         </div>
         
-        <div id="servers-container">{server_cards}</div>
+        <div id="servers-container">
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDXUMzI10DMx1TMy2fpHgYFhqaWJcYq5WaKlbqqxsaGuiYmRpW6SsUWyrkmSoYGFuVmqiamZYV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeNrbBXvebt8KJjcqGFg4pFYk5ySWpZYV5CmABPfsAKkEADKPTTs')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDXUMzI10DMx1TMy2fpHgYFhqaWJcYq5WaKlbqqxsaGuiYmRpW6SsUWyrkmSo...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDXUMzI10DMx1TMy2fpHgYFhqaWJcYq5WaKlbqqxsaGuiYmRpW6SsUWyrkmSoYGFuVmqiamZYV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeNrbBXvebt8KJjcqGFg4pFYk5ySWpZYV5CmABPfsAKkEADKPTTs')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_0', 'exclave://vless?eNpTZmBgMDXUMzI10DMx1TMy2fpHgYFhqaWJcYq5WaKlbqqxsaGuiYmRpW6SsUWyrkmSoYGFuVmqiamZYV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeNrbBXvebt8KJjcqGFg4pFYk5ySWpZYV5CmABPfsAKkEADKPTTs')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q0', 'exclave://vless?eNpTZmBgMDXUMzI10DMx1TMy2fpHgYFhqaWJcYq5WaKlbqqxsaGuiYmRpW6SsUWyrkmSoYGFuVmqiamZYV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeNrbBXvebt8KJjcqGFg4pFYk5ySWpZYV5CmABPfsAKkEADKPTTs')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q0" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://http?eNpjYWBgUAZiCxM9Q3M9E3M9Q9MNWkCBxsaS5A95-XlPgYycz41gwAAiQGIMHEAdYEaGUW7pDwYUAFTHBKSmvl2w5-32zWByo4GFQ2pFck5iWWpZQZ4CSGzPTpBaAJ7BK44')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://http?eNpjYWBgUAZiCxM9Q3M9E3M9Q9MNWkCBxsaS5A95-XlPgYycz41gwAAiQGIMHEAdYEaGUW...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://http?eNpjYWBgUAZiCxM9Q3M9E3M9Q9MNWkCBxsaS5A95-XlPgYycz41gwAAiQGIMHEAdYEaGUW7pDwYUAFTHBKSmvl2w5-32zWByo4GFQ2pFck5iWWpZQZ4CSGzPTpBaAJ7BK44')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_1', 'exclave://http?eNpjYWBgUAZiCxM9Q3M9E3M9Q9MNWkCBxsaS5A95-XlPgYycz41gwAAiQGIMHEAdYEaGUW7pDwYUAFTHBKSmvl2w5-32zWByo4GFQ2pFck5iWWpZQZ4CSGzPTpBaAJ7BK44')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q1', 'exclave://http?eNpjYWBgUAZiCxM9Q3M9E3M9Q9MNWkCBxsaS5A95-XlPgYycz41gwAAiQGIMHEAdYEaGUW7pDwYUAFTHBKSmvl2w5-32zWByo4GFQ2pFck5iWWpZQZ4CSGzPTpBaAJ7BK44')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q1" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDQ21bMw0TM31jM02LCbkYFhqZmRgVGSkbGBromhebKuSYpFqm6SmZGJrkGauWFiWqJlsrlpSl5-3tPyz8V5mXqGhoYGBgZ6KZV5ZWZ6ealfmvQZQKCxJAerdCMIMIJJkBkMHEC1YEaGUW7pDwYUwATEU98u2PN2-wowuczAQsEhtSI5J7EstawgDyS2ZydIIQABhEEm')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDQ21bMw0TM31jM02LCbkYFhqZmRgVGSkbGBromhebKuSYpFqm6SmZGJrkGau...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDQ21bMw0TM31jM02LCbkYFhqZmRgVGSkbGBromhebKuSYpFqm6SmZGJrkGauWFiWqJlsrlpSl5-3tPyz8V5mXqGhoYGBgZ6KZV5ZWZ6ealfmvQZQKCxJAerdCMIMIJJkBkMHEC1YEaGUW7pDwYUwATEU98u2PN2-wowuczAQsEhtSI5J7EstawgDyS2ZydIIQABhEEm')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_2', 'exclave://vless?eNpTZmBgMDQ21bMw0TM31jM02LCbkYFhqZmRgVGSkbGBromhebKuSYpFqm6SmZGJrkGauWFiWqJlsrlpSl5-3tPyz8V5mXqGhoYGBgZ6KZV5ZWZ6ealfmvQZQKCxJAerdCMIMIJJkBkMHEC1YEaGUW7pDwYUwATEU98u2PN2-wowuczAQsEhtSI5J7EstawgDyS2ZydIIQABhEEm')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q2', 'exclave://vless?eNpTZmBgMDQ21bMw0TM31jM02LCbkYFhqZmRgVGSkbGBromhebKuSYpFqm6SmZGJrkGauWFiWqJlsrlpSl5-3tPyz8V5mXqGhoYGBgZ6KZV5ZWZ6ealfmvQZQKCxJAerdCMIMIJJkBkMHEC1YEaGUW7pDwYUwATEU98u2PN2-wowuczAQsEhtSI5J7EstawgDyS2ZydIIQABhEEm')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q2" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgyC_TTStKzEtONdQzsCwryNNLzn8bABRfamSaZmGWnGSoa2RoYqBrYmBhqpuYlJykm2ycaJCaaJ5okpRqkJef97T8c6N-WU5qcfF6BhBoBImBCQYOIBfMyDDKLf3BgAKYgHjq2wV73m5fDSa3G1g4pFYk5ySWpQIdoQAS27MTpBAAXjw3Dg')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgyC_TTStKzEtONdQzsCwryNNLzn8bABRfamSaZmGWnGSoa2RoYqBrYmBhqpuYl...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgyC_TTStKzEtONdQzsCwryNNLzn8bABRfamSaZmGWnGSoa2RoYqBrYmBhqpuYlJykm2ycaJCaaJ5okpRqkJef97T8c6N-WU5qcfF6BhBoBImBCQYOIBfMyDDKLf3BgAKYgHjq2wV73m5fDSa3G1g4pFYk5ySWpQIdoQAS27MTpBAAXjw3Dg')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_3', 'exclave://vless?eNpTZmBgyC_TTStKzEtONdQzsCwryNNLzn8bABRfamSaZmGWnGSoa2RoYqBrYmBhqpuYlJykm2ycaJCaaJ5okpRqkJef97T8c6N-WU5qcfF6BhBoBImBCQYOIBfMyDDKLf3BgAKYgHjq2wV73m5fDSa3G1g4pFYk5ySWpQIdoQAS27MTpBAAXjw3Dg')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q3', 'exclave://vless?eNpTZmBgyC_TTStKzEtONdQzsCwryNNLzn8bABRfamSaZmGWnGSoa2RoYqBrYmBhqpuYlJykm2ycaJCaaJ5okpRqkJef97T8c6N-WU5qcfF6BhBoBImBCQYOIBfMyDDKLf3BgAKYgHjq2wV73m5fDSa3G1g4pFYk5ySWpQIdoQAS27MTpBAAXjw3Dg')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q3" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQwMTPUMLIDLVM9r2W4GBobGx_HNxeWpKap5eWW5iRUFiXmqOXnL-W_3E3CcMINBYkoNVQSMIMIKIvPy8pwwcQKVgRoZRbukPBhQQYulUEOUZ5uv3jQnIm_Z2wZ6323eAyVUKBhYOqRXJOYllqWUFeQogwT07QHoAJTs-mw')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAZiQwMTPUMLIDLVM9r2W4GBobGx_HNxeWpKap5eWW5iRUFiXmqOXnL-W_3E...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQwMTPUMLIDLVM9r2W4GBobGx_HNxeWpKap5eWW5iRUFiXmqOXnL-W_3E3CcMINBYkoNVQSMIMIKIvPy8pwwcQKVgRoZRbukPBhQQYulUEOUZ5uv3jQnIm_Z2wZ6323eAyVUKBhYOqRXJOYllqWUFeQogwT07QHoAJTs-mw')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_4', 'exclave://trojan?eNpjYmBgUAZiQwMTPUMLIDLVM9r2W4GBobGx_HNxeWpKap5eWW5iRUFiXmqOXnL-W_3E3CcMINBYkoNVQSMIMIKIvPy8pwwcQKVgRoZRbukPBhQQYulUEOUZ5uv3jQnIm_Z2wZ6323eAyVUKBhYOqRXJOYllqWUFeQogwT07QHoAJTs-mw')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q4', 'exclave://trojan?eNpjYmBgUAZiQwMTPUMLIDLVM9r2W4GBobGx_HNxeWpKap5eWW5iRUFiXmqOXnL-W_3E3CcMINBYkoNVQSMIMIKIvPy8pwwcQKVgRoZRbukPBhQQYulUEOUZ5uv3jQnIm_Z2wZ6323eAyVUKBhYOqRXJOYllqWUFeQogwT07QHoAJTs-mw')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q4" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+        <div class="flex justify-center my-8">
+            <ins style="width: 300px;height:250px" data-width="300" data-height="250" class="g2fb0b4c321" data-domain="//data527.click" data-affquery="/e3435b2a507722939b6f/2fb0b4c321/?placementName=default">
+                <script src="//data527.click/js/responsive.js" async></script>
+            </ins>
+        </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDQx0zO0MNUzMjHSMzTcqnaagWGpSVqKUYppmpluiomhua5BUpKFrqWxsaFuqpFBYlpKqlFacopRXn7e05LkDyCqsbEoNTEns-RnbmKFXtHXNSbOHsb5plX-vslufr5JeeURedmO6QZubqkFucXJBoFVGYkZEdmhVUmGmdkpFslmSaYWSclJSQbJxkabkzOK8nOfMlSU5BTrFhUUVeiWZRZn5ufplqYUmJhsrihN-cDAAXQ0yFaGDKPc0h8MKIAJiKe-XbDn7fbVYHKdgoGFQ2pFck5iWWpZQR5IbM8OkEIA3nZYEQ')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDQx0zO0MNUzMjHSMzTcqnaagWGpSVqKUYppmpluiomhua5BUpKFrqWxsaFuq...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDQx0zO0MNUzMjHSMzTcqnaagWGpSVqKUYppmpluiomhua5BUpKFrqWxsaFuqpFBYlpKqlFacopRXn7e05LkDyCqsbEoNTEns-RnbmKFXtHXNSbOHsb5plX-vslufr5JeeURedmO6QZubqkFucXJBoFVGYkZEdmhVUmGmdkpFslmSaYWSclJSQbJxkabkzOK8nOfMlSU5BTrFhUUVeiWZRZn5ufplqYUmJhsrihN-cDAAXQ0yFaGDKPc0h8MKIAJiKe-XbDn7fbVYHKdgoGFQ2pFck5iWWpZQR5IbM8OkEIA3nZYEQ')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_5', 'exclave://vless?eNpTZmBgMDQx0zO0MNUzMjHSMzTcqnaagWGpSVqKUYppmpluiomhua5BUpKFrqWxsaFuqpFBYlpKqlFacopRXn7e05LkDyCqsbEoNTEns-RnbmKFXtHXNSbOHsb5plX-vslufr5JeeURedmO6QZubqkFucXJBoFVGYkZEdmhVUmGmdkpFslmSaYWSclJSQbJxkabkzOK8nOfMlSU5BTrFhUUVeiWZRZn5ufplqYUmJhsrihN-cDAAXQ0yFaGDKPc0h8MKIAJiKe-XbDn7fbVYHKdgoGFQ2pFck5iWWpZQR5IbM8OkEIA3nZYEQ')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q5', 'exclave://vless?eNpTZmBgMDQx0zO0MNUzMjHSMzTcqnaagWGpSVqKUYppmpluiomhua5BUpKFrqWxsaFuqpFBYlpKqlFacopRXn7e05LkDyCqsbEoNTEns-RnbmKFXtHXNSbOHsb5plX-vslufr5JeeURedmO6QZubqkFucXJBoFVGYkZEdmhVUmGmdkpFslmSaYWSclJSQbJxkabkzOK8nOfMlSU5BTrFhUUVeiWZRZn5ufplqYUmJhsrihN-cDAAXQ0yFaGDKPc0h8MKIAJiKe-XbDn7fbVYHKdgoGFQ2pFck5iWWpZQR5IbM8OkEIA3nZYEQ')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q5" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://hysteria2?eNpjY2BgMDQ10DMyMdQzt9QzNNhmwcLAsC-jsrgktSgz0Sg-LbG4JCcxLzW-MKXCJN_QsjTXKtUsyN21IKAgzyg_06OiMCcpKNXVrcArqsjA0j8zLCepMSXVSC9DD6YzI7-4JDMvXa_oayMQMDKgAUNL460wNlCegQlIT1Z4u2DP2-07wOQqA0uH1IrknMSy1LKCPJAyAIBAOFg')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://hysteria2?eNpjY2BgMDQ10DMyMdQzt9QzNNhmwcLAsC-jsrgktSgz0Sg-LbG4JCcxLzW-MKXCJ...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://hysteria2?eNpjY2BgMDQ10DMyMdQzt9QzNNhmwcLAsC-jsrgktSgz0Sg-LbG4JCcxLzW-MKXCJN_QsjTXKtUsyN21IKAgzyg_06OiMCcpKNXVrcArqsjA0j8zLCepMSXVSC9DD6YzI7-4JDMvXa_oayMQMDKgAUNL460wNlCegQlIT1Z4u2DP2-07wOQqA0uH1IrknMSy1LKCPJAyAIBAOFg')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_6', 'exclave://hysteria2?eNpjY2BgMDQ10DMyMdQzt9QzNNhmwcLAsC-jsrgktSgz0Sg-LbG4JCcxLzW-MKXCJN_QsjTXKtUsyN21IKAgzyg_06OiMCcpKNXVrcArqsjA0j8zLCepMSXVSC9DD6YzI7-4JDMvXa_oayMQMDKgAUNL460wNlCegQlIT1Z4u2DP2-07wOQqA0uH1IrknMSy1LKCPJAyAIBAOFg')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q6', 'exclave://hysteria2?eNpjY2BgMDQ10DMyMdQzt9QzNNhmwcLAsC-jsrgktSgz0Sg-LbG4JCcxLzW-MKXCJN_QsjTXKtUsyN21IKAgzyg_06OiMCcpKNXVrcArqsjA0j8zLCepMSXVSC9DD6YzI7-4JDMvXa_oayMQMDKgAUNL460wNlCegQlIT1Z4u2DP2-07wOQqA0uH1IrknMSy1LKCPJAyAIBAOFg')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q6" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://hysteria2?eNpjY2BgMDQx0TM21DMz1jPdYcHCwLAvo7K4JLUoM9EoPi2xuCQnMS81PtXE0NiyqqK01KrM0sLX0CzZxyi4wrk01y20IsosvTwkqDQvszTE1CTHuTEl1UQvQw-mMyO_uCQzL12v6GsjEDAyoAFDS-OtMDZQnoEJSE9-u2DP2-27wOQOBQNLh9SK5JzEstSygjyQMgD5hTdy')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://hysteria2?eNpjY2BgMDQx0TM21DMz1jPdYcHCwLAvo7K4JLUoM9EoPi2xuCQnMS81PtXE0Niyq...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://hysteria2?eNpjY2BgMDQx0TM21DMz1jPdYcHCwLAvo7K4JLUoM9EoPi2xuCQnMS81PtXE0NiyqqK01KrM0sLX0CzZxyi4wrk01y20IsosvTwkqDQvszTE1CTHuTEl1UQvQw-mMyO_uCQzL12v6GsjEDAyoAFDS-OtMDZQnoEJSE9-u2DP2-27wOQOBQNLh9SK5JzEstSygjyQMgD5hTdy')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_7', 'exclave://hysteria2?eNpjY2BgMDQx0TM21DMz1jPdYcHCwLAvo7K4JLUoM9EoPi2xuCQnMS81PtXE0NiyqqK01KrM0sLX0CzZxyi4wrk01y20IsosvTwkqDQvszTE1CTHuTEl1UQvQw-mMyO_uCQzL12v6GsjEDAyoAFDS-OtMDZQnoEJSE9-u2DP2-27wOQOBQNLh9SK5JzEstSygjyQMgD5hTdy')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q7', 'exclave://hysteria2?eNpjY2BgMDQx0TM21DMz1jPdYcHCwLAvo7K4JLUoM9EoPi2xuCQnMS81PtXE0NiyqqK01KrM0sLX0CzZxyi4wrk01y20IsosvTwkqDQvszTE1CTHuTEl1UQvQw-mMyO_uCQzL12v6GsjEDAyoAFDS-OtMDZQnoEJSE9-u2DP2-27wOQOBQNLh9SK5JzEstSygjyQMgD5hTdy')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q7" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQzMDPUMzPXMgabEhmpeBobGxJPlDXn7eUyAj53N5ebleXmZeSWpeSn56Ym5qsV5e6pdGEGAAESB1DBxAY8CMDKPc0h8MKCDNPCUpNcUiyTA50cLU0Mgk1dzSOCnRLNkgKTktxSDlERNQzaS3C_a83b4DTK4xsHRIrUjOSSxLLSvIA5kAAOI2OMw')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAZiQzMDPUMzPXMgabEhmpeBobGxJPlDXn7eUyAj53N5ebleXmZeSWpeSn56...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQzMDPUMzPXMgabEhmpeBobGxJPlDXn7eUyAj53N5ebleXmZeSWpeSn56Ym5qsV5e6pdGEGAAESB1DBxAY8CMDKPc0h8MKCDNPCUpNcUiyTA50cLU0Mgk1dzSOCnRLNkgKTktxSDlERNQzaS3C_a83b4DTK4xsHRIrUjOSSxLLSvIA5kAAOI2OMw')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_8', 'exclave://trojan?eNpjYmBgUAZiQzMDPUMzPXMgabEhmpeBobGxJPlDXn7eUyAj53N5ebleXmZeSWpeSn56Ym5qsV5e6pdGEGAAESB1DBxAY8CMDKPc0h8MKCDNPCUpNcUiyTA50cLU0Mgk1dzSOCnRLNkgKTktxSDlERNQzaS3C_a83b4DTK4xsHRIrUjOSSxLLSvIA5kAAOI2OMw')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q8', 'exclave://trojan?eNpjYmBgUAZiQzMDPUMzPXMgabEhmpeBobGxJPlDXn7eUyAj53N5ebleXmZeSWpeSn56Ym5qsV5e6pdGEGAAESB1DBxAY8CMDKPc0h8MKCDNPCUpNcUiyTA50cLU0Mgk1dzSOCnRLNkgKTktxSDlERNQzaS3C_a83b4DTK4xsHRIrUjOSSxLLSvIA5kAAOI2OMw')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q8" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDSw1DM0MtAztDTUM9umdpqBYamhmVmSSaK5sW5islGaroFxqoVuknGSpa5lslmapXGqgYmZSWpeft7TkuQPIKqxsSg1MSez5GduYoVe0dc1Js4exvmmVf6-yW5-vkl55RF52Y7pBm5uqQW5xckGgVUZiRkR2aFVSYaZ2SkWyWZJphZJyUlJBsnGRpuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDPIVoYMo9zSHwwogAmIJ79dsOft9pVgcpWCgaVDakVyTmJZallBHkgJADDGUqk')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDSw1DM0MtAztDTUM9umdpqBYamhmVmSSaK5sW5islGaroFxqoVuknGSpa5ls...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDSw1DM0MtAztDTUM9umdpqBYamhmVmSSaK5sW5islGaroFxqoVuknGSpa5lslmapXGqgYmZSWpeft7TkuQPIKqxsSg1MSez5GduYoVe0dc1Js4exvmmVf6-yW5-vkl55RF52Y7pBm5uqQW5xckGgVUZiRkR2aFVSYaZ2SkWyWZJphZJyUlJBsnGRpuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDPIVoYMo9zSHwwogAmIJ79dsOft9pVgcpWCgaVDakVyTmJZallBHkgJADDGUqk')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_9', 'exclave://vless?eNpTZmBgMDSw1DM0MtAztDTUM9umdpqBYamhmVmSSaK5sW5islGaroFxqoVuknGSpa5lslmapXGqgYmZSWpeft7TkuQPIKqxsSg1MSez5GduYoVe0dc1Js4exvmmVf6-yW5-vkl55RF52Y7pBm5uqQW5xckGgVUZiRkR2aFVSYaZ2SkWyWZJphZJyUlJBsnGRpuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDPIVoYMo9zSHwwogAmIJ79dsOft9pVgcpWCgaVDakVyTmJZallBHkgJADDGUqk')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q9', 'exclave://vless?eNpTZmBgMDSw1DM0MtAztDTUM9umdpqBYamhmVmSSaK5sW5islGaroFxqoVuknGSpa5lslmapXGqgYmZSWpeft7TkuQPIKqxsSg1MSez5GduYoVe0dc1Js4exvmmVf6-yW5-vkl55RF52Y7pBm5uqQW5xckGgVUZiRkR2aFVSYaZ2SkWyWZJphZJyUlJBsnGRpuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDPIVoYMo9zSHwwogAmIJ79dsOft9pVgcpWCgaVDakVyTmJZallBHkgJADDGUqk')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q9" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+        <div class="flex justify-center my-8">
+            <ins style="width: 300px;height:250px" data-width="300" data-height="250" class="g2fb0b4c321" data-domain="//data527.click" data-affquery="/e3435b2a507722939b6f/2fb0b4c321/?placementName=default">
+                <script src="//data527.click/js/responsive.js" async></script>
+            </ins>
+        </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAbi3LTK_NLijNS8dL28HL3UUr38oue7GRkYGhvLP2OT0y_JKi_2yagwCHZzDHY3ybF0cw3yMnzOAAKNJTlY9TSCACOIyMvPe8rAAVQKZmQY5Zb-YEABAaVZBoZByRahyY6WnlXJbsmR_sUW3r7-Gc5VZokRRheZgGomvF2w5-2eHQaWDqkVyTmJZallBXkgvQCf1Ua4')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAbi3LTK_NLijNS8dL28HL3UUr38oue7GRkYGhvLP2OT0y_JKi_2yagwCHZz...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAbi3LTK_NLijNS8dL28HL3UUr38oue7GRkYGhvLP2OT0y_JKi_2yagwCHZzDHY3ybF0cw3yMnzOAAKNJTlY9TSCACOIyMvPe8rAAVQKZmQY5Zb-YEABAaVZBoZByRahyY6WnlXJbsmR_sUW3r7-Gc5VZokRRheZgGomvF2w5-2eHQaWDqkVyTmJZallBXkgvQCf1Ua4')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_10', 'exclave://trojan?eNpjYmBgUAbi3LTK_NLijNS8dL28HL3UUr38oue7GRkYGhvLP2OT0y_JKi_2yagwCHZzDHY3ybF0cw3yMnzOAAKNJTlY9TSCACOIyMvPe8rAAVQKZmQY5Zb-YEABAaVZBoZByRahyY6WnlXJbsmR_sUW3r7-Gc5VZokRRheZgGomvF2w5-2eHQaWDqkVyTmJZallBXkgvQCf1Ua4')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q10', 'exclave://trojan?eNpjYmBgUAbi3LTK_NLijNS8dL28HL3UUr38oue7GRkYGhvLP2OT0y_JKi_2yagwCHZzDHY3ybF0cw3yMnzOAAKNJTlY9TSCACOIyMvPe8rAAVQKZmQY5Zb-YEABAaVZBoZByRahyY6WnlXJbsmR_sUW3r7-Gc5VZokRRheZgGomvF2w5-2eHQaWDqkVyTmJZallBXkgvQCf1Ua4')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q10" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vmess?eNpTZmBgyDM0NzUyMrGwNDXUy8lMNU3RS67M_7qbkYFhaVKaUXKqcbKRrrGxZZquiaWRmW6SpVGKbpJ5ioVxYpphknGSWWJpyfvyz9gNadJnAIHGkhwcChpBgAFMgEFeft5TBg4YI8Mot_QHAwpgAuJJbxfsebt9LZjcYGDpkFqRnJNYllpWkAdSAQDQFkDT')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vmess?eNpTZmBgyDM0NzUyMrGwNDXUy8lMNU3RS67M_7qbkYFhaVKaUXKqcbKRrrGxZZquiaWRm...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vmess?eNpTZmBgyDM0NzUyMrGwNDXUy8lMNU3RS67M_7qbkYFhaVKaUXKqcbKRrrGxZZquiaWRmW6SpVGKbpJ5ioVxYpphknGSWWJpyfvyz9gNadJnAIHGkhwcChpBgAFMgEFeft5TBg4YI8Mot_QHAwpgAuJJbxfsebt9LZjcYGDpkFqRnJNYllpWkAdSAQDQFkDT')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_11', 'exclave://vmess?eNpTZmBgyDM0NzUyMrGwNDXUy8lMNU3RS67M_7qbkYFhaVKaUXKqcbKRrrGxZZquiaWRmW6SpVGKbpJ5ioVxYpphknGSWWJpyfvyz9gNadJnAIHGkhwcChpBgAFMgEFeft5TBg4YI8Mot_QHAwpgAuJJbxfsebt9LZjcYGDpkFqRnJNYllpWkAdSAQDQFkDT')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q11', 'exclave://vmess?eNpTZmBgyDM0NzUyMrGwNDXUy8lMNU3RS67M_7qbkYFhaVKaUXKqcbKRrrGxZZquiaWRmW6SpVGKbpJ5ioVxYpphknGSWWJpyfvyz9gNadJnAIHGkhwcChpBgAFMgEFeft5TBg4YI8Mot_QHAwpgAuJJbxfsebt9LZjcYGDpkFqRnJNYllpWkAdSAQDQFkDT')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q11" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgsDTVMzQz1jMysNQzNNnxVZ6BYamxpZmxRZK5ha5xqpG5rkmKZYpuYlpaom5qiqFxcqpBsoVpknleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1URYmXkaeqTlBlskZxtkWYSU5YRkZxaaVyU6hORGO5uUeTuHJTkVZhXmO5eYpSWnmKcZGxsaW5oYppo-TM4ryc58yNIKMZeAAug7MyDDKLf3BgAKYgHjS2wV73m7fDCY3Glg6pFYk5ySWpZYV5IFUAADfBknY')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgsDTVMzQz1jMysNQzNNnxVZ6BYamxpZmxRZK5ha5xqpG5rkmKZYpuYlpaom5qi...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgsDTVMzQz1jMysNQzNNnxVZ6BYamxpZmxRZK5ha5xqpG5rkmKZYpuYlpaom5qiqFxcqpBsoVpknleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1URYmXkaeqTlBlskZxtkWYSU5YRkZxaaVyU6hORGO5uUeTuHJTkVZhXmO5eYpSWnmKcZGxsaW5oYppo-TM4ryc58yNIKMZeAAug7MyDDKLf3BgAKYgHjS2wV73m7fDCY3Glg6pFYk5ySWpZYV5IFUAADfBknY')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_12', 'exclave://vless?eNpTZmBgsDTVMzQz1jMysNQzNNnxVZ6BYamxpZmxRZK5ha5xqpG5rkmKZYpuYlpaom5qiqFxcqpBsoVpknleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1URYmXkaeqTlBlskZxtkWYSU5YRkZxaaVyU6hORGO5uUeTuHJTkVZhXmO5eYpSWnmKcZGxsaW5oYppo-TM4ryc58yNIKMZeAAug7MyDDKLf3BgAKYgHjS2wV73m7fDCY3Glg6pFYk5ySWpZYV5IFUAADfBknY')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q12', 'exclave://vless?eNpTZmBgsDTVMzQz1jMysNQzNNnxVZ6BYamxpZmxRZK5ha5xqpG5rkmKZYpuYlpaom5qiqFxcqpBsoVpknleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1URYmXkaeqTlBlskZxtkWYSU5YRkZxaaVyU6hORGO5uUeTuHJTkVZhXmO5eYpSWnmKcZGxsaW5oYppo-TM4ryc58yNIKMZeAAug7MyDDKLf3BgAKYgHjS2wV73m7fDCY3Glg6pFYk5ySWpZYV5IFUAADfBknY')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q12" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiC0s9IwMLPSMjIL1TWJaBobGxJPlDXn7eUyAj53NBjl5xalFZalFxSWJJsV7R1wwjroySkgJ9Q72NjUDAACJAqhk4gIaBGRlGuaU_GFCAo3eIkW9ZlnGesatjgYefYVFxWrCXroFzum6-pXF25QsmoJrJbxfsebt9O5jcpWBg6ZBakZyTWJZaVpAHMgIAOkk6pQ')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAZiC0s9IwMLPSMjIL1TWJaBobGxJPlDXn7eUyAj53NBjl5xalFZalFxSWJJ...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiC0s9IwMLPSMjIL1TWJaBobGxJPlDXn7eUyAj53NBjl5xalFZalFxSWJJsV7R1wwjroySkgJ9Q72NjUDAACJAqhk4gIaBGRlGuaU_GFCAo3eIkW9ZlnGesatjgYefYVFxWrCXroFzum6-pXF25QsmoJrJbxfsebt9O5jcpWBg6ZBakZyTWJZaVpAHMgIAOkk6pQ')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_13', 'exclave://trojan?eNpjYmBgUAZiC0s9IwMLPSMjIL1TWJaBobGxJPlDXn7eUyAj53NBjl5xalFZalFxSWJJsV7R1wwjroySkgJ9Q72NjUDAACJAqhk4gIaBGRlGuaU_GFCAo3eIkW9ZlnGesatjgYefYVFxWrCXroFzum6-pXF25QsmoJrJbxfsebt9O5jcpWBg6ZBakZyTWJZaVpAHMgIAOkk6pQ')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q13', 'exclave://trojan?eNpjYmBgUAZiC0s9IwMLPSMjIL1TWJaBobGxJPlDXn7eUyAj53NBjl5xalFZalFxSWJJsV7R1wwjroySkgJ9Q72NjUDAACJAqhk4gIaBGRlGuaU_GFCAo3eIkW9ZlnGesatjgYefYVFxWrCXroFzum6-pXF25QsmoJrJbxfsebt9O5jcpWBg6ZBakZyTWJZaVpAHMgIAOkk6pQ')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q13" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgsDTVMzQz1jMyNNAz3jBRnoFhqbGlmbFFkrmFrnGqkbmuSYplim5iWlqibmqKoXFyqkGyhWmSeV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeMrbBXvebl8NJrcrGFg6pFYk5ySWpZYV5CmA1AAA6WRJcg')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgsDTVMzQz1jMyNNAz3jBRnoFhqbGlmbFFkrmFrnGqkbmuSYplim5iWlqibmqKo...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgsDTVMzQz1jMyNNAz3jBRnoFhqbGlmbFFkrmFrnGqkbmuSYplim5iWlqibmqKoXFyqkGyhWmSeV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeMrbBXvebl8NJrcrGFg6pFYk5ySWpZYV5CmA1AAA6WRJcg')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_14', 'exclave://vless?eNpTZmBgsDTVMzQz1jMyNNAz3jBRnoFhqbGlmbFFkrmFrnGqkbmuSYplim5iWlqibmqKoXFyqkGyhWmSeV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeMrbBXvebl8NJrcrGFg6pFYk5ySWpZYV5CmA1AAA6WRJcg')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q14', 'exclave://vless?eNpTZmBgsDTVMzQz1jMyNNAz3jBRnoFhqbGlmbFFkrmFrnGqkbmuSYplim5iWlqibmqKoXFyqkGyhWmSeV5-3tOS5A8gqrGxKDUxJ7PkZ25ihV7R1zVRFiZeRp6pOUGWyRnG2RZhJTlhGRnFppXJTqE5EY7m5R5O4clORVmFeY7l5ilJaeYpxkbGxpbmhimmj5MzivJznzI0goxl4AA6DszIMMot_cGAApiAeMrbBXvebl8NJrcrGFg6pFYk5ySWpZYV5CmA1AAA6WRJcg')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q14" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+        <div class="flex justify-center my-8">
+            <ins style="width: 300px;height:250px" data-width="300" data-height="250" class="g2fb0b4c321" data-domain="//data527.click" data-affquery="/e3435b2a507722939b6f/2fb0b4c321/?placementName=default">
+                <script src="//data527.click/js/responsive.js" async></script>
+            </ins>
+        </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://ss?eNpjY2BgUAZiS2M9Q3MTPUMzEz2LnQe1GRgaG0uSP-Tl5z1tbASRIMzAAVQIZjBkGOWW_mBAAckZiUBkZKCbmVqSpluQn1NpaGyw1SAp2cLAMNE8OTHZNM3QeEsjAwMTUPGktwv2vN2-C0zuNzRwSK1IzkksSy0ryAMZBQCWJC9J')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://ss?eNpjY2BgUAZiS2M9Q3MTPUMzEz2LnQe1GRgaG0uSP-Tl5z1tbASRIMzAAVQIZjBkGOWW_mBA...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://ss?eNpjY2BgUAZiS2M9Q3MTPUMzEz2LnQe1GRgaG0uSP-Tl5z1tbASRIMzAAVQIZjBkGOWW_mBAAckZiUBkZKCbmVqSpluQn1NpaGyw1SAp2cLAMNE8OTHZNM3QeEsjAwMTUPGktwv2vN2-C0zuNzRwSK1IzkksSy0ryAMZBQCWJC9J')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_15', 'exclave://ss?eNpjY2BgUAZiS2M9Q3MTPUMzEz2LnQe1GRgaG0uSP-Tl5z1tbASRIMzAAVQIZjBkGOWW_mBAAckZiUBkZKCbmVqSpluQn1NpaGyw1SAp2cLAMNE8OTHZNM3QeEsjAwMTUPGktwv2vN2-C0zuNzRwSK1IzkksSy0ryAMZBQCWJC9J')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q15', 'exclave://ss?eNpjY2BgUAZiS2M9Q3MTPUMzEz2LnQe1GRgaG0uSP-Tl5z1tbASRIMzAAVQIZjBkGOWW_mBAAckZiUBkZKCbmVqSpluQn1NpaGyw1SAp2cLAMNE8OTHZNM3QeEsjAwMTUPGktwv2vN2-C0zuNzRwSK1IzkksSy0ryAMZBQCWJC9J')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q15" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQzNzPUMgsjDVMzTd1KnFwNDYWJL8IS8_7ymQkfO5EQwYQQRIjIEDqAfMyDDKLf3BgAKSQ8r0LANcUpxLdMsrk5yK3A0Lcyo8TUO9ShNdXzEBFUx6u2DP2-0rwOQyQwOH1IrknMSy1LKCPJB2APdaMNI')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAZiQzNzPUMgsjDVMzTd1KnFwNDYWJL8IS8_7ymQkfO5EQwYQQRIjIEDqAfM...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiQzNzPUMgsjDVMzTd1KnFwNDYWJL8IS8_7ymQkfO5EQwYQQRIjIEDqAfMyDDKLf3BgAKSQ8r0LANcUpxLdMsrk5yK3A0Lcyo8TUO9ShNdXzEBFUx6u2DP2-0rwOQyQwOH1IrknMSy1LKCPJB2APdaMNI')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_16', 'exclave://trojan?eNpjYmBgUAZiQzNzPUMgsjDVMzTd1KnFwNDYWJL8IS8_7ymQkfO5EQwYQQRIjIEDqAfMyDDKLf3BgAKSQ8r0LANcUpxLdMsrk5yK3A0Lcyo8TUO9ShNdXzEBFUx6u2DP2-0rwOQyQwOH1IrknMSy1LKCPJB2APdaMNI')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q16', 'exclave://trojan?eNpjYmBgUAZiQzNzPUMgsjDVMzTd1KnFwNDYWJL8IS8_7ymQkfO5EQwYQQRIjIEDqAfMyDDKLf3BgAKSQ8r0LANcUpxLdMsrk5yK3A0Lcyo8TUO9ShNdXzEBFUx6u2DP2-0rwOQyQwOH1IrknMSy1LKCPJB2APdaMNI')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q16" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiCwM9Q3NjPSNjQz0j0y0tBgwMjY0lyR_y8vOeAhk5n8vLy_WKU3MT80oyk4tLEgtyUtNL8_SSczKTXzeCACOIAKlm4ACaBmZkGOWW_mBAAeUFlp7FmZEWRqWBGcm56X7Ohqn5TmeZgDJTFN4u2PN2-2YwuUXB0MAhtSI5J7EstawgD6QTADfnOcA')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://trojan?eNpjYmBgUAZiCwM9Q3NjPSNjQz0j0y0tBgwMjY0lyR_y8vOeAhk5n8vLy_WKU3MT80oy...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://trojan?eNpjYmBgUAZiCwM9Q3NjPSNjQz0j0y0tBgwMjY0lyR_y8vOeAhk5n8vLy_WKU3MT80oyk4tLEgtyUtNL8_SSczKTXzeCACOIAKlm4ACaBmZkGOWW_mBAAeUFlp7FmZEWRqWBGcm56X7Ohqn5TmeZgDJTFN4u2PN2-2YwuUXB0MAhtSI5J7EstawgD6QTADfnOcA')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_17', 'exclave://trojan?eNpjYmBgUAZiCwM9Q3NjPSNjQz0j0y0tBgwMjY0lyR_y8vOeAhk5n8vLy_WKU3MT80oyk4tLEgtyUtNL8_SSczKTXzeCACOIAKlm4ACaBmZkGOWW_mBAAeUFlp7FmZEWRqWBGcm56X7Ohqn5TmeZgDJTFN4u2PN2-2YwuUXB0MAhtSI5J7EstawgD6QTADfnOcA')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q17', 'exclave://trojan?eNpjYmBgUAZiCwM9Q3NjPSNjQz0j0y0tBgwMjY0lyR_y8vOeAhk5n8vLy_WKU3MT80oyk4tLEgtyUtNL8_SSczKTXzeCACOIAKlm4ACaBmZkGOWW_mBAAeUFlp7FmZEWRqWBGcm56X7Ohqn5TmeZgDJTFN4u2PN2-2YwuUXB0MAhtSI5J7EstawgD6QTADfnOcA')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q17" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDXUMzI10DPWM9r5X4GBYalhqoWpQaJZom5aklGqrompqYWuhXFiiq65QUpqWqpRonmqkVleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1IYYljj65lcH-JR7xqZF-mW6RxkVBeSYFpo5mua5OzlUpvh55QWHmqRlBgY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAuhBkDUOGUW7pDwYUwATEk94u2PN2-0owucrQwCG1IjknsSy1rCAPpAIA_m9NCg')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDXUMzI10DPWM9r5X4GBYalhqoWpQaJZom5aklGqrompqYWuhXFiiq65QUpqW...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDXUMzI10DPWM9r5X4GBYalhqoWpQaJZom5aklGqrompqYWuhXFiiq65QUpqWqpRonmqkVleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1IYYljj65lcH-JR7xqZF-mW6RxkVBeSYFpo5mua5OzlUpvh55QWHmqRlBgY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAuhBkDUOGUW7pDwYUwATEk94u2PN2-0owucrQwCG1IjknsSy1rCAPpAIA_m9NCg')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_18', 'exclave://vless?eNpTZmBgMDXUMzI10DPWM9r5X4GBYalhqoWpQaJZom5aklGqrompqYWuhXFiiq65QUpqWqpRonmqkVleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1IYYljj65lcH-JR7xqZF-mW6RxkVBeSYFpo5mua5OzlUpvh55QWHmqRlBgY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAuhBkDUOGUW7pDwYUwATEk94u2PN2-0owucrQwCG1IjknsSy1rCAPpAIA_m9NCg')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q18', 'exclave://vless?eNpTZmBgMDXUMzI10DPWM9r5X4GBYalhqoWpQaJZom5aklGqrompqYWuhXFiiq65QUpqWqpRonmqkVleft7TkuQPIKqxsSg1MSez5GduYoVe0dc1IYYljj65lcH-JR7xqZF-mW6RxkVBeSYFpo5mua5OzlUpvh55QWHmqRlBgY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAuhBkDUOGUW7pDwYUwATEk94u2PN2-0owucrQwCG1IjknsSy1rCAPpAIA_m9NCg')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q18" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+            <div class="server-card bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all mb-4 text-right" data-type="EXCLAVE">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase">EXCLAVE SERVER</span>
+                    </div>
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDbXMzS21DM20TM02GZ7iYFhqXmasXmSkUWSbnJacpKuSbJRom5iqomhrkWaUUpKsqWxkWlKSl5-3tOS5A8gqrGxKDUxJ7PkZ2JBpl5JYqleWbZe0dc1iRG-gRk-WamOjsnh2eU5icGppukW3snGBmFZhYEGJYllKT6Jli4mBqlZoY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAOhVkG0OGUW7pDwYUwATEk98u2PN2-3YwuUvB0MAhtSI5J7EstawgD6QEAEXkUMY')" class="text-gray-400 hover:text-indigo-600"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono break-all mb-4 bg-gray-50 p-2 rounded leading-relaxed">exclave://vless?eNpTZmBgMDbXMzS21DM20TM02GZ7iYFhqXmasXmSkUWSbnJacpKuSbJRom5iqomhrkWaU...</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyText('exclave://vless?eNpTZmBgMDbXMzS21DM20TM02GZ7iYFhqXmasXmSkUWSbnJacpKuSbJRom5iqomhrkWaUUpKsqWxkWlKSl5-3tOS5A8gqrGxKDUxJ7PkZ2JBpl5JYqleWbZe0dc1iRG-gRk-WamOjsnh2eU5icGppukW3snGBmFZhYEGJYllKT6Jli4mBqlZoY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAOhVkG0OGUW7pDwYUwATEk98u2PN2-3YwuUvB0MAhtSI5J7EstawgD6QEAEXkUMY')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">نسخ الإعدادات</button>
+                    <button onclick="downloadConfig('EXCLAVE_19', 'exclave://vless?eNpTZmBgMDbXMzS21DM20TM02GZ7iYFhqXmasXmSkUWSbnJacpKuSbJRom5iqomhrkWaUUpKsqWxkWlKSl5-3tOS5A8gqrGxKDUxJ7PkZ2JBpl5JYqleWbZe0dc1iRG-gRk-WamOjsnh2eU5icGppukW3snGBmFZhYEGJYllKT6Jli4mBqlZoY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAOhVkG0OGUW7pDwYUwATEk98u2PN2-3YwuUvB0MAhtSI5J7EstawgD6QEAEXkUMY')" class="py-3 bg-slate-800 text-white rounded-xl font-bold text-xs hover:bg-black transition-all shadow-lg">تحميل الملف <i class="fas fa-download ml-1"></i></button>
+                    <button onclick="toggleQR('q19', 'exclave://vless?eNpTZmBgMDbXMzS21DM20TM02GZ7iYFhqXmasXmSkUWSbnJacpKuSbJRom5iqomhrkWaUUpKsqWxkWlKSl5-3tOS5A8gqrGxKDUxJ7PkZ2JBpl5JYqleWbZe0dc1iRG-gRk-WamOjsnh2eU5icGppukW3snGBmFZhYEGJYllKT6Jli4mBqlZoY3JGUX5uU8ZKkpyinWLCooqdMsyizPz83RLUwpMTDZXlKZ8YOAAOhVkG0OGUW7pDwYUwATEk98u2PN2-3YwuUvB0MAhtSI5J7EstawgD6QEAEXkUMY')" class="col-span-2 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200 uppercase">إظهار الباركود 🔳</button>
+                </div>
+                <div id="q19" class="hidden mt-4 p-4 border-2 border-dashed border-indigo-50 bg-indigo-50/30 rounded-2xl flex flex-col items-center animate-fade-in"></div>
+            </div>
+        <div class="flex justify-center my-8">
+            <ins style="width: 300px;height:250px" data-width="300" data-height="250" class="g2fb0b4c321" data-domain="//data527.click" data-affquery="/e3435b2a507722939b6f/2fb0b4c321/?placementName=default">
+                <script src="//data527.click/js/responsive.js" async></script>
+            </ins>
+        </div></div>
     </main>
 
+    <section class="max-w-xl mx-auto px-6 mt-16 text-right">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm space-y-8">
+            <div>
+                <h3 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-file-contract text-indigo-500"></i> الشروط والأحكام
+                </h3>
+                <p class="text-xs text-gray-500 leading-loose">
+                    تحدد هذه الشروط والأحكام قواعد استخدام موقع velss الإلكتروني. بدخولك إلى هذا الموقع، فإننا نفترض موافقتك على هذه الشروط.
+                    <span class="text-indigo-500 font-bold ad-click" onclick="triggerBridge()">اقرأ المزيد</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-slate-950 mt-20 pt-16 pb-10 px-6 text-center text-white relative">
-        <div class="absolute -top-10 left-0 w-full overflow-hidden leading-none rotate-180">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-10 fill-slate-950">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-            </svg>
-        </div>
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-4 italic">© velss.com. جميع الحقوق محفوظة.</p>
-        <div class="flex justify-center gap-6 text-indigo-400 font-bold text-xs">
-            <span class="ad-click" onclick="triggerBridge()">Privacy Policy</span>
-            <span class="ad-click" onclick="triggerBridge()">Contact Us</span>
-        </div>
     </footer>
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-3 rounded-full text-xs font-bold opacity-0 transition-all pointer-events-none z-50">تمت العملية بنجاح! ✅</div>
@@ -120,7 +463,7 @@
         function startCountdown() {
             let h = 5, m = 59, s = 59;
             setInterval(() => {
-                if(s > 0) s--; else { s = 59; if(m > 0) m--; else { m = 59; h--; } }
+                s--; if(s<0){s=59; m--;} if(m<0){m=59; h--;}
                 document.getElementById('countdown').innerText = String(h).padStart(2,'0')+":"+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
             }, 1000);
         }
