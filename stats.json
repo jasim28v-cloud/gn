@@ -1,1 +1,1 @@
-{"last_updated": "2026-04-12T15:05:20.749052", "total_servers": 15, "by_protocol": {"vmess": 0, "vless": 0, "trojan": 0, "ss": 0, "exclave": 15, "other": 0}}
+{"last_updated": "2026-04-12T15:22:26.468192", "total_servers": 15, "by_protocol": {"vmess": 1, "vless": 12, "trojan": 0, "ss": 0, "other": 2}}

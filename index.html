@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOKA - The Freedom Proxy</title>
+    <title>DOKA - Exclave Servers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,12 +17,10 @@
         .dark .text-gray-800 { color: #e2e8f0 !important; }
         .dark .border-gray-100, .dark .border-gray-200 { border-color: #334155 !important; }
         .tab-btn.active { background: #2563eb; color: white; }
-        #chart-container { max-width: 600px; margin: 0 auto; }
     </style>
 </head>
 <body class="antialiased text-gray-800" id="main-body">
 
-    <!-- شريط علوي -->
     <header class="border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center text-sm">
             <div class="flex items-center gap-3 text-gray-600">
@@ -33,56 +31,40 @@
             </div>
             <div class="flex items-center gap-4">
                 <button id="dark-mode-toggle" class="text-gray-500 hover:text-gray-700"><i class="fas fa-moon"></i></button>
-                <select id="lang-select" class="bg-transparent border border-gray-300 rounded-lg px-2 py-1 text-xs">
-                    <option value="ar">🇸🇦 العربية</option>
-                    <option value="en">🇬🇧 English</option>
-                </select>
-                <div class="text-gray-500"><i class="far fa-clock"></i> <span id="update-time">15:05</span></div>
+                <div class="text-gray-500"><i class="far fa-clock"></i> <span id="update-time">15:22</span></div>
             </div>
         </div>
     </header>
 
-    <!-- القسم الرئيسي -->
     <section class="hero-gradient relative overflow-hidden border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 text-center">
-            <h1 class="text-4xl md:text-6xl font-black mb-6 text-gray-900 leading-tight" id="main-title">الحرية لتصفح <br> أي موقع من أي مكان.</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-12" id="main-subtitle">DOKA تستخدم سيرفرات قوية لتجربة إنترنت سريعة وآمنة.</p>
+            <h1 class="text-4xl md:text-6xl font-black mb-6 text-gray-900 leading-tight">حرية التصفح <br> مع سيرفرات Exclave</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-12">سيرفرات حصرية من Exclave VPN - سريعة، آمنة، ومحدثة تلقائياً.</p>
             <div class="flex justify-center">
                 <div class="bg-white border border-gray-200 rounded-3xl px-10 py-5 shadow-sm inline-flex items-center gap-4">
                     <span class="text-6xl font-black text-blue-600" id="total-servers-count">15</span>
-                    <span class="text-gray-500 leading-tight text-right" id="servers-label">سيرفر<br>V2Ray نشط</span>
+                    <span class="text-gray-500 leading-tight text-right">سيرفر<br>Exclave نشط</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- تبويبات الفلترة -->
     <section class="max-w-7xl mx-auto px-4 py-8">
         <div class="flex flex-wrap justify-center gap-2" id="filter-tabs">
             <button class="tab-btn active px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium" data-filter="all">الكل (<span id="count-all">15</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vmess">VMess (<span id="count-vmess">0</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vless">VLess (<span id="count-vless">0</span>)</button>
+            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vmess">VMess (<span id="count-vmess">1</span>)</button>
+            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vless">VLess (<span id="count-vless">12</span>)</button>
             <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="trojan">Trojan (<span id="count-trojan">0</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="exclave">Exclave (<span id="count-exclave">15</span>)</button>
+            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="ss">Shadowsocks (<span id="count-ss">0</span>)</button>
         </div>
     </section>
 
-    <!-- قائمة السيرفرات -->
     <section class="max-w-7xl mx-auto px-4 py-8">
-        <h2 class="text-2xl font-bold mb-6 text-gray-900" id="servers-heading">اختر السيرفر المناسب لك</h2>
+        <h2 class="text-2xl font-bold mb-6 text-gray-900">اختر السيرفر المناسب لك</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="servers-grid"></div>
         <div id="no-servers-msg" class="text-center py-12 text-gray-400 hidden">لا توجد سيرفرات متاحة.</div>
     </section>
 
-    <!-- صفحة الإحصائيات (مخفية افتراضيًا) -->
-    <section id="stats-page" class="max-w-7xl mx-auto px-4 py-12 hidden">
-        <h2 class="text-3xl font-bold text-center mb-8">📊 إحصائيات السيرفرات</h2>
-        <div id="chart-container"><canvas id="stats-chart"></canvas></div>
-        <p class="text-center text-gray-500 mt-4">آخر تحديث: <span id="stats-last-update"></span></p>
-        <button id="back-to-servers" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl mx-auto block">عودة للسيرفرات</button>
-    </section>
-
-    <!-- تذييل -->
     <footer class="bg-gray-900 text-white py-12 mt-12">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-gray-400 text-sm">© 2026 DOKA. جميع الحقوق محفوظة.</p>
@@ -90,62 +72,20 @@
         </div>
     </footer>
 
+    <div id="stats-page" class="max-w-7xl mx-auto px-4 py-12 hidden">
+        <h2 class="text-3xl font-bold text-center mb-8">📊 إحصائيات السيرفرات</h2>
+        <div id="chart-container"><canvas id="stats-chart"></canvas></div>
+        <p class="text-center text-gray-500 mt-4">آخر تحديث: <span id="stats-last-update"></span></p>
+        <button id="back-to-servers" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl mx-auto block">عودة للسيرفرات</button>
+    </div>
+
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-all pointer-events-none z-50">✅ تم النسخ!</div>
 
     <script>
-        // بيانات السيرفرات (محقونة من بايثون)
-        const serversData = [{"link": "exclave://vless?eNpTZmBgMDQx0zO01DMyNdEzMtrwW4GBYamFZZpFmqlxsq5RarKprqFhmqFuUlpaqq6JWbKJuYVRYrJhonleft7TkuQPIKqxsSg1MSez5Gd5ebleYkFBTqpecv7bNW5hPgZFFubexrploQFG3hGBEYZZpT6-bq4eXiVlFeXevrp5uWbxAZE5OcmJhklGycYpJqmmaduSM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDbIYoYMo9zSHwwogAmIJ71dsOft9s1gcqOBhUNqRXJOYllqWUEeSAUA_-ZTmw", "proto": "EXCLAVE", "flag": "🌍", "ping": 232}, {"link": "exclave://vless?eNpTZmBgMLS00DM0N9MzNdEzNNw4dy0Dw1IjM1Mjk-TkVN0UU0MTXRMDIJFoYmSma2xmmpZkZGaWaGiSkpef97T8c3FeZkFBaoleSmJeWmpeul5yfq5ectoTfQj_OQMX0ILg1GTd8NSk4Pzk7NQS3YCi_JL85Pw3JTm4NDeCAAOYBFnCwAE0A8zIMMot_cGAApiAeNLbBXvebl8LJjcYWDikViTnJJallhXkgVQAAIw_TSE", "proto": "EXCLAVE", "flag": "🌍", "ping": 68}, {"link": "exclave://vless?eNpTZmBgMLQw1TMyMtQztLTUMzLcdEaSgWGpYZKpuZm5uZGuuVGyua5JSrKxrmViopmukWmasYFlonkKUENeft7T9KKCx2U5qcWfGRhA3EYQwcDBAOExZBjllv5gQAFMQDxZ4e2CPW-3bweTuwwsHVIrknMSy1LLCvJASgAO8C2D", "proto": "EXCLAVE", "flag": "🌍", "ping": 203}, {"link": "exclave://vless?eNpTZmBgsDTSMzXWMzQy0DO03LibkYFhqVFaogkQGegaGlmk6ppYmJnpWqZZGupamFkmWaRYmBtZWprn5ec9LUn-AKIaG4tSE3MyS36m5-enJCcWpSTlAwm94oz8D2uKXAKiovydfHOdkuJz_bwDXFPLqwosQ0vNqrLdiwLMI_zDCvKCqlJLIlySG5MzivJznzJUlOQU6xYVFFXolmUWZ-bn6ZamFJiYbK4oTfnAwAF0L8hKhgyj3NIfDCiACYgnvV2w5-327WByl4GlQ2pFck5iWWpZQR5IBQDPjFH-", "proto": "EXCLAVE", "flag": "🌍", "ping": 163}, {"link": "exclave://vless?eNpTZmBgMDQw1jMyNtIzMjTWs9jOysHAsNTIzNTIJDk5VTfF1NBE18QASCSaGJnpGpuZpiUZmZklGpqk5OXnPS3_XJyXWVCQWqKXlp5WrpeTn6yX_Fg_JTEvLTXvOQMX0PDg1GTd8NSk4Pzk7NQS3YCi_JL85Pw3JTnYNDaCAAOYBBnOAHQJA5iRYZRb-oMBBTAB8aS3C_a83b4eTG41sHRIrUjOSSxLLSvIA6kAAA0oSL4", "proto": "EXCLAVE", "flag": "🌍", "ping": 95}, {"link": "exclave://hysteria2?eNpjY2BgMLQ00jM0M9OzMNIzMt5swcLAsNTI1NjMMjHJQDfFzNxA18TE1FzXwiLNUNfUwjLFMskg0djA2KgRVV8jEDAyoAFjUxOTbTAOUAEDE5Ce9HbBnrfbN4DJ_QaWDqkVyTmJZallBXkgVQAJLyRN", "proto": "EXCLAVE", "flag": "🌍", "ping": 187}, {"link": "exclave://vless?eNpVj7FOwzAYhA0T78Fsq47jJN0QEkWAVFUCIVbX_t1aSuzgOGnara_AE7CwMSAVqQO8TsZKXZBgo2HjpLtvueHuFCFE4yFhjNCMRPzt4wihFylFQlMRYVAwwHHGORYRaCxlqiOaTUXKlXW2C3LfY732IHITfhbGBvC4NBZI7uwMa-ehCsR_vV6OblQR2vycX9fThwt9t0wm4yuoH8fZsuLsdrK4ZysR2Gg1YzIRXFOmNEtBJZ2ce1d0qA15hX3pW9yYyjiLa1XG8aat1R6dHG70S9A8Kupv9E_HBz_tnj93281fvg-GZ9DKXDTQlLZv_AJi8Vqw", "proto": "EXCLAVE", "flag": "🌍", "ping": 236}, {"link": "exclave://vless?eNpTZmBgsDTRMzLTMzKxBOKdvxUYGJaaGBibGidaGuumGqRa6JoYGCXrJppYGOimGCSlmRkYJKVaJCXl5ec9TS8qeFxR-YuBoSg1MSez5GdiXn5JRmqRXnliUVFmflF-WlJOYnJ2cWmeXlHpuzVeFca6IWYZef6FkQZePsYRRd5BqZH-UdnmEY7JHkW6WaU55ZFVTskRVVkGjckZRfm5TxkaQbYwcAAdCWZkGOWW_mBAAUxAPOntgj1vt28Hk7sMDRxSK5JzEstSywryQCoAJ7NNQA", "proto": "EXCLAVE", "flag": "🌍", "ping": 69}, {"link": "exclave://vless?eNpTZmBgMDQw0TMy1DMyMtHbupuRgWGpsYGpiaFlaoquSWqaqa5xqmmirkWKiYVukoWBcbKphYWpcYpxXn7e0_LPxWZ6-Un5-Ul6ye_0U5IMDYxMLBLTUpKTDFISnzGAQGNJDrKiDGOujE2NQMAAIhpBhjBwAJWBGRlGuaU_GFAAExBPertgz9vt68DkZkMDh9SK5JzEstSygjyQCgDfFT3A", "proto": "EXCLAVE", "flag": "🌍", "ping": 90}, {"link": "exclave://vless?eNpTZmBgMDHTM7LQMzfQM925m5GBYampcapZolmqka5xskmSrolBkpluklGKka5pknGioamBpYGhYVJeft7TkuQPIKqxsSg1MSez5Gd5ebleflFick6qXnL-2zVOzs6ZruYWoaVF2eWp_pGlfkEeaUVZlfkeoVlelsYWEWZhhX66uckhvnmBJtuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdCrIPoYMo9zSHwwogAmIJ79dsOft9hVgcr-CoYFDakVyTmJZallBHkgJAJUQT_E", "proto": "EXCLAVE", "flag": "🌍", "ping": 170}, {"link": "exclave://vless?eNpTZmBgMLQ01TM01TMyNNYzMt08SZ6BYWmSSVKyoUFSmq6FQZqlrolBsqVukkmqqa6RpYWhebJRmoGlpVFeft7T9KKCx2U5qcXFukBWsm5RamJOZslPBgYoIzNFryxbLzn_7ZrgpDBvf1ffLG-DYs-cpPJ0k8TsSqd001wfU--o8nIn3dQUk1RXV_PIvKDkxuSMovzcpwyNIAsYOIAOBDMyjHJLfzCgACYgnvR2wZ632_eDyWWGBg6pFck5iWWpZQV5IBUA5mNJ8A", "proto": "EXCLAVE", "flag": "🌍", "ping": 62}, {"link": "exclave://hysteria2?eNpjY2BgMDI00jO0BGJjPSOTTRYsDAxLzQ1NDVPNkix0DVIsUnVNTE0sdBMt04x0E9NMjZKTk42SU9JSGzOyDfUqMhPzczIrS_WSK_O_NgIBIwMaMDEx3gxjA-UZmID0pLcL9rzdvhZMbjA0cEitSM5JLEstK8gDqQIAz5MpPA", "proto": "EXCLAVE", "flag": "🌍", "ping": 70}, {"link": "exclave://vmess?eNpTZmBgMDfRM7HQM7LQM7TcEADkLzVJTTG1sDQ30TWxSE7RNTE3StVNtjC00E1LsjAxT7JINjU1TEssLXlf_rlRPzm5pMzQWC_XuHQHAwg05uXnPXUAM0EsBg4YI8Mot_QHAwpgAuJJbxfsebt9F5jcZGjgkFqRnJNYllpWkAdSAQBJ8i5I", "proto": "EXCLAVE", "flag": "🌍", "ping": 82}, {"link": "exclave://vless?eNpTZmBgMDI01zM0sdQzNtAz3B4iyMCwNNXU1DLJyMBQ19woKUnXJDXJRNcyxSBV1zzVKMnAyDIlLdXMOC8_72lJ8gcQ1dhYlJqYk1nyMy0zJ7VYLze_ODm_PC-1vNjIRK_o65rgpDBvf1ffLG-DYs-cpPJ0k8TsSqd001wfU--o8nIn3dQUk1RXV_PIvKDkxuSMovzcpwwVJTnFukUFRRW6ZZnFmfl5uqUpBSYmmytKUz4wcACdDLKVIcMot_QHAwpgAuLJbxfsebt9O5jcpWBo6JBakZyTWJZaVpAHUgIA4bBSiw", "proto": "EXCLAVE", "flag": "🌍", "ping": 97}, {"link": "exclave://vless?eNpTZmBgMDQ11zMy0jMyMdQz3L6bkYFhaZqJQZphUnKSroVxkpmuiWFasm6isaGpboqRqYFRcqKBhbmlUV5-3tOS5A8gqrGxKDUxJ7PkZ3p-fkpyYlFKUj6Q0CvOyP-wpsglICrK38k31ykpPtfPO8A1tbyqwDK01Kwq270owDzCP6wgL6gqtSTCJbkxOaMoP_cpQ0VJTrFuUUFRhW5ZZnFmfp5uaUqBicnmitKUDwwcQPeCrGTIMMot_cGAApiAeNLbBXvebt8OJncZGjqkViTnJJallhXkgVQAADhsUnw-", "proto": "EXCLAVE", "flag": "🌍", "ping": 130}];
+        const serversData = [{"link": "exclave://vless?eNpTZmBgMDQx0zO01DMyNdEzMtrwW4GBYamFZZpFmqlxsq5RarKprqFhmqFuUlpaqq6JWbKJuYVRYrJhonleft7TkuQPIKqxsSg1MSez5Gd5ebleYkFBTqpecv7bNW5hPgZFFubexrploQFG3hGBEYZZpT6-bq4eXiVlFeXevrp5uWbxAZE5OcmJhklGycYpJqmmaduSM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdDbIYoYMo9zSHwwogAmIJ71dsOft9s1gcqOBhUNqRXJOYllqWUEeSAUA_-ZTmw", "proto": "VLESS", "flag": "🌍", "ping": 238}, {"link": "exclave://vless?eNpTZmBgMLS00DM0N9MzNdEzNNw4dy0Dw1IjM1Mjk-TkVN0UU0MTXRMDIJFoYmSma2xmmpZkZGaWaGiSkpef97T8c3FeZkFBaoleSmJeWmpeul5yfq5ectoTfQj_OQMX0ILg1GTd8NSk4Pzk7NQS3YCi_JL85Pw3JTm4NDeCAAOYBFnCwAE0A8zIMMot_cGAApiAeNLbBXvebl8LJjcYWDikViTnJJallhXkgVQAAIw_TSE", "proto": "VLESS", "flag": "🌍", "ping": 188}, {"link": "exclave://vless?eNpTZmBgMLQw1TMyMtQztLTUMzLcdEaSgWGpYZKpuZm5uZGuuVGyua5JSrKxrmViopmukWmasYFlonkKUENeft7T9KKCx2U5qcWfGRhA3EYQwcDBAOExZBjllv5gQAFMQDxZ4e2CPW-3bweTuwwsHVIrknMSy1LLCvJASgAO8C2D", "proto": "VLESS", "flag": "🌍", "ping": 84}, {"link": "exclave://vless?eNpTZmBgsDTSMzXWMzQy0DO03LibkYFhqVFaogkQGegaGlmk6ppYmJnpWqZZGupamFkmWaRYmBtZWprn5ec9LUn-AKIaG4tSE3MyS36m5-enJCcWpSTlAwm94oz8D2uKXAKiovydfHOdkuJz_bwDXFPLqwosQ0vNqrLdiwLMI_zDCvKCqlJLIlySG5MzivJznzJUlOQU6xYVFFXolmUWZ-bn6ZamFJiYbK4oTfnAwAF0L8hKhgyj3NIfDCiACYgnvV2w5-327WByl4GlQ2pFck5iWWpZQR5IBQDPjFH-", "proto": "VLESS", "flag": "🌍", "ping": 123}, {"link": "exclave://vless?eNpTZmBgMDQw1jMyNtIzMjTWs9jOysHAsNTIzNTIJDk5VTfF1NBE18QASCSaGJnpGpuZpiUZmZklGpqk5OXnPS3_XJyXWVCQWqKXlp5WrpeTn6yX_Fg_JTEvLTXvOQMX0PDg1GTd8NSk4Pzk7NQS3YCi_JL85Pw3JTnYNDaCAAOYBBnOAHQJA5iRYZRb-oMBBTAB8aS3C_a83b4eTG41sHRIrUjOSSxLLSvIA6kAAA0oSL4", "proto": "VLESS", "flag": "🌍", "ping": 87}, {"link": "exclave://hysteria2?eNpjY2BgMLQ00jM0M9OzMNIzMt5swcLAsNTI1NjMMjHJQDfFzNxA18TE1FzXwiLNUNfUwjLFMskg0djA2KgRVV8jEDAyoAFjUxOTbTAOUAEDE5Ce9HbBnrfbN4DJ_QaWDqkVyTmJZallBXkgVQAJLyRN", "proto": "EXCLAVE", "flag": "🌍", "ping": 123}, {"link": "exclave://vless?eNpVj7FOwzAYhA0T78Fsq47jJN0QEkWAVFUCIVbX_t1aSuzgOGnara_AE7CwMSAVqQO8TsZKXZBgo2HjpLtvueHuFCFE4yFhjNCMRPzt4wihFylFQlMRYVAwwHHGORYRaCxlqiOaTUXKlXW2C3LfY732IHITfhbGBvC4NBZI7uwMa-ehCsR_vV6OblQR2vycX9fThwt9t0wm4yuoH8fZsuLsdrK4ZysR2Gg1YzIRXFOmNEtBJZ2ce1d0qA15hX3pW9yYyjiLa1XG8aat1R6dHG70S9A8Kupv9E_HBz_tnj93281fvg-GZ9DKXDTQlLZv_AJi8Vqw", "proto": "VLESS", "flag": "🌍", "ping": 113}, {"link": "exclave://vless?eNpTZmBgsDTRMzLTMzKxBOKdvxUYGJaaGBibGidaGuumGqRa6JoYGCXrJppYGOimGCSlmRkYJKVaJCXl5ec9TS8qeFxR-YuBoSg1MSez5GdiXn5JRmqRXnliUVFmflF-WlJOYnJ2cWmeXlHpuzVeFca6IWYZef6FkQZePsYRRd5BqZH-UdnmEY7JHkW6WaU55ZFVTskRVVkGjckZRfm5TxkaQbYwcAAdCWZkGOWW_mBAAUxAPOntgj1vt28Hk7sMDRxSK5JzEstSywryQCoAJ7NNQA", "proto": "VLESS", "flag": "🌍", "ping": 236}, {"link": "exclave://vless?eNpTZmBgMDQw0TMy1DMyMtHbupuRgWGpsYGpiaFlaoquSWqaqa5xqmmirkWKiYVukoWBcbKphYWpcYpxXn7e0_LPxWZ6-Un5-Ul6ye_0U5IMDYxMLBLTUpKTDFISnzGAQGNJDrKiDGOujE2NQMAAIhpBhjBwAJWBGRlGuaU_GFAAExBPertgz9vt68DkZkMDh9SK5JzEstSygjyQCgDfFT3A", "proto": "VLESS", "flag": "🌍", "ping": 246}, {"link": "exclave://vless?eNpTZmBgMDHTM7LQMzfQM925m5GBYampcapZolmqka5xskmSrolBkpluklGKka5pknGioamBpYGhYVJeft7TkuQPIKqxsSg1MSez5Gd5ebleflFick6qXnL-2zVOzs6ZruYWoaVF2eWp_pGlfkEeaUVZlfkeoVlelsYWEWZhhX66uckhvnmBJtuTM4ryc58yVJTkFOsWFRRV6JZlFmfm5-mWphSYmGyuKE35wMABdCrIPoYMo9zSHwwogAmIJ79dsOft9hVgcr-CoYFDakVyTmJZallBHkgJAJUQT_E", "proto": "VLESS", "flag": "🌍", "ping": 137}, {"link": "exclave://vless?eNpTZmBgMLQ01TM01TMyNNYzMt08SZ6BYWmSSVKyoUFSmq6FQZqlrolBsqVukkmqqa6RpYWhebJRmoGlpVFeft7T9KKCx2U5qcXFukBWsm5RamJOZslPBgYoIzNFryxbLzn_7ZrgpDBvf1ffLG-DYs-cpPJ0k8TsSqd001wfU--o8nIn3dQUk1RXV_PIvKDkxuSMovzcpwyNIAsYOIAOBDMyjHJLfzCgACYgnvR2wZ632_eDyWWGBg6pFck5iWWpZQV5IBUA5mNJ8A", "proto": "VLESS", "flag": "🌍", "ping": 66}, {"link": "exclave://hysteria2?eNpjY2BgMDI00jO0BGJjPSOTTRYsDAxLzQ1NDVPNkix0DVIsUnVNTE0sdBMt04x0E9NMjZKTk42SU9JSGzOyDfUqMhPzczIrS_WSK_O_NgIBIwMaMDEx3gxjA-UZmID0pLcL9rzdvhZMbjA0cEitSM5JLEstK8gDqQIAz5MpPA", "proto": "EXCLAVE", "flag": "🌍", "ping": 198}, {"link": "exclave://vmess?eNpTZmBgMDfRM7HQM7LQM7TcEADkLzVJTTG1sDQ30TWxSE7RNTE3StVNtjC00E1LsjAxT7JINjU1TEssLXlf_rlRPzm5pMzQWC_XuHQHAwg05uXnPXUAM0EsBg4YI8Mot_QHAwpgAuJJbxfsebt9F5jcZGjgkFqRnJNYllpWkAdSAQBJ8i5I", "proto": "VMESS", "flag": "🌍", "ping": 81}, {"link": "exclave://vless?eNpTZmBgMDI01zM0sdQzNtAz3B4iyMCwNNXU1DLJyMBQ19woKUnXJDXJRNcyxSBV1zzVKMnAyDIlLdXMOC8_72lJ8gcQ1dhYlJqYk1nyMy0zJ7VYLze_ODm_PC-1vNjIRK_o65rgpDBvf1ffLG-DYs-cpPJ0k8TsSqd001wfU--o8nIn3dQUk1RXV_PIvKDkxuSMovzcpwwVJTnFukUFRRW6ZZnFmfl5uqUpBSYmmytKUz4wcACdDLKVIcMot_QHAwpgAuLJbxfsebt9O5jcpWBo6JBakZyTWJZaVpAHUgIA4bBSiw", "proto": "VLESS", "flag": "🌍", "ping": 84}, {"link": "exclave://vless?eNpTZmBgMDQ11zMy0jMyMdQz3L6bkYFhaZqJQZphUnKSroVxkpmuiWFasm6isaGpboqRqYFRcqKBhbmlUV5-3tOS5A8gqrGxKDUxJ7PkZ3p-fkpyYlFKUj6Q0CvOyP-wpsglICrK38k31ykpPtfPO8A1tbyqwDK01Kwq270owDzCP6wgL6gqtSTCJbkxOaMoP_cpQ0VJTrFuUUFRhW5ZZnFmfp5uaUqBicnmitKUDwwcQPeCrGTIMMot_cGAApiAeNLbBXvebt8OJncZGjqkViTnJJallhXkgVQAADhsUnw-", "proto": "VLESS", "flag": "🌍", "ping": 185}];
         let currentFilter = 'all';
         let chartInstance = null;
         
-        // ترجمة النصوص (AR / EN)
-        const translations = {
-            ar: {
-                title: 'الحرية لتصفح <br> أي موقع من أي مكان.',
-                subtitle: 'DOKA تستخدم سيرفرات قوية لتجربة إنترنت سريعة وآمنة.',
-                serversLabel: 'سيرفر<br>V2Ray نشط',
-                chooseServer: 'اختر السيرفر المناسب لك',
-                copy: 'نسخ',
-                active: 'نشط',
-                unprotected: 'غير محمي',
-                stats: 'عرض الإحصائيات',
-                back: 'عودة للسيرفرات'
-            },
-            en: {
-                title: 'Freedom to Browse <br> Any Website from Anywhere.',
-                subtitle: 'DOKA uses powerful servers for a fast and secure internet experience.',
-                serversLabel: 'Active<br>V2Ray Servers',
-                chooseServer: 'Choose your server',
-                copy: 'Copy',
-                active: 'Active',
-                unprotected: 'Unprotected',
-                stats: 'Show Statistics',
-                back: 'Back to Servers'
-            }
-        };
-        
-        let currentLang = 'ar';
-        
-        function applyLanguage(lang) {
-            const t = translations[lang];
-            document.getElementById('main-title').innerHTML = t.title;
-            document.getElementById('main-subtitle').textContent = t.subtitle;
-            document.getElementById('servers-label').innerHTML = t.serversLabel;
-            document.getElementById('servers-heading').textContent = t.chooseServer;
-            document.getElementById('show-stats-btn').textContent = t.stats;
-            document.querySelector('#back-to-servers').textContent = t.back;
-            document.querySelector('span.text-red-500').textContent = t.unprotected;
-            // تحديث أزرار النسخ
-            document.querySelectorAll('.copy-btn-text').forEach(el => el.textContent = t.copy);
-        }
-        
-        document.getElementById('lang-select').addEventListener('change', (e) => {
-            currentLang = e.target.value;
-            applyLanguage(currentLang);
-            renderServers(currentFilter);
-        });
-        
-        // الوضع الليلي
         const darkToggle = document.getElementById('dark-mode-toggle');
         darkToggle.addEventListener('click', () => {
             document.getElementById('main-body').classList.toggle('dark');
@@ -153,7 +93,6 @@
                 '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         });
         
-        // عرض السيرفرات مع الفلترة
         function renderServers(filter) {
             const grid = document.getElementById('servers-grid');
             const filtered = filter === 'all' ? serversData : serversData.filter(s => s.proto.toLowerCase() === filter);
@@ -168,8 +107,8 @@
             let html = '';
             filtered.forEach((server, i) => {
                 const shortLink = server.link.substring(0, 60) + (server.link.length > 60 ? '...' : '');
-                const isActive = Math.random() > 0.2; // 80% احتمالية أنه نشط
-                const statusText = currentLang === 'ar' ? (isActive ? 'نشط' : 'خامل') : (isActive ? 'Active' : 'Idle');
+                const isActive = Math.random() > 0.1;
+                const statusText = isActive ? 'نشط' : 'خامل';
                 const statusColor = isActive ? 'text-green-600' : 'text-red-500';
                 
                 html += `
@@ -185,9 +124,7 @@
                         </div>
                         <p class="text-xs font-mono text-gray-500 bg-gray-50 p-3 rounded-xl mb-4 break-all border border-gray-100" dir="ltr">${shortLink}</p>
                         <div class="flex gap-2">
-                            <button onclick="copyText('${server.link}')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700">
-                                <span class="copy-btn-text">${translations[currentLang].copy}</span>
-                            </button>
+                            <button onclick="copyText('${server.link}')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700">نسخ</button>
                             <button onclick="toggleQR('q${i}', '${server.link}')" class="px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"><i class="fas fa-qrcode"></i></button>
                         </div>
                         <div id="q${i}" class="hidden mt-4 p-4 bg-white rounded-2xl flex justify-center border-2 border-dashed border-blue-100"></div>
@@ -197,7 +134,6 @@
             grid.innerHTML = html;
         }
         
-        // فلترة
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
@@ -207,7 +143,6 @@
             });
         });
         
-        // نسخ
         window.copyText = (text) => {
             navigator.clipboard.writeText(text);
             const toast = document.getElementById('toast');
@@ -215,20 +150,18 @@
             setTimeout(() => toast.style.opacity = '0', 2000);
         };
         
-        // QR Code
         window.toggleQR = (id, link) => {
             const el = document.getElementById(id);
             if (el.innerHTML === "") new QRCode(el, { text: link, width: 160, height: 160, colorDark: "#1e293b" });
             el.classList.toggle('hidden');
         };
         
-        // الإحصائيات
         document.getElementById('show-stats-btn').addEventListener('click', async () => {
             document.querySelector('header').style.display = 'none';
             document.querySelector('.hero-gradient').style.display = 'none';
             document.getElementById('filter-tabs').style.display = 'none';
             document.getElementById('servers-grid').style.display = 'none';
-            document.getElementById('servers-heading').style.display = 'none';
+            document.querySelector('h2').style.display = 'none';
             document.getElementById('stats-page').classList.remove('hidden');
             
             const res = await fetch('stats.json');
@@ -250,16 +183,9 @@
             });
         });
         
-        document.getElementById('back-to-servers').addEventListener('click', () => {
-            location.reload();
-        });
-        
-        // جلب IP
+        document.getElementById('back-to-servers').addEventListener('click', () => location.reload());
         fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => document.getElementById('user-ip').textContent = d.ip);
-        
-        // عرض أولي
         renderServers('all');
-        applyLanguage('ar');
     </script>
 </body>
 </html>
