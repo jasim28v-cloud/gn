@@ -1,39 +1,31 @@
-name: Vortex Trends Auto Update
+name: Update DOKA Servers
 
 on:
   schedule:
-    # تحديث كل 30 دقيقة
-    - cron: '*/30 * * * *'
-  workflow_dispatch: # للسماح لك بتشغيله يدوياً للتجربة
-
-permissions:
-  contents: write
+    - cron: '0 */3 * * *'  # كل 3 ساعات
+  workflow_dispatch:        # تشغيل يدوي
 
 jobs:
-  build:
+  scrape-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: 📥 استنساخ المستودع
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: 🐍 تنصيب بايثون
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4 lxml
+      - name: 📦 تنصيب المكتبات
+        run: pip install requests
 
-      - name: Run Scraper
-        # هذا السطر سيقوم بتشغيل كود التريندات الجديد
+      - name: 🚀 تشغيل سكريبت الكشط
         run: python scraper.py
 
-      - name: Commit and Push changes
+      - name: 📤 رفع التغييرات للمستودع
         run: |
-          git config --global user.name "Vortex-Bot"
-          git config --global user.email "bot@vortex.com"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
-          # السطر التالي يمنع الفشل إذا لم يتغير المحتوى
-          git commit -m "Vortex Trends Update: $(date)" || exit 0
-          git push
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 تحديث تلقائي للسيرفرات $(date +'%Y-%m-%d %H:%M')" && git push)
