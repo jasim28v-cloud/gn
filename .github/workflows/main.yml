@@ -1,31 +1,57 @@
-name: Update DOKA Servers
+name: 🔄 Update DOKA Servers (Professional)
 
+# ==================== المشغلات ====================
 on:
   schedule:
-    - cron: '0 */3 * * *'  # كل 3 ساعات
-  workflow_dispatch:        # تشغيل يدوي
+    # يعمل كل 3 ساعات (يمكنك تغيير التوقيت)
+    - cron: '0 */3 * * *'
+  workflow_dispatch:      # يسمح بالتشغيل اليدوي من واجهة GitHub
+  push:
+    branches: [ main ]    # يعمل عند رفع تغييرات على الفرع الرئيسي (اختياري)
 
+# ==================== الأذونات (مهم جدًا لصلاحية git push) ====================
+permissions:
+  contents: write         # يسمح للـ Workflow بالكتابة في المستودع
+
+# ==================== المهام ====================
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: 📥 استنساخ المستودع
+      - name: 📥 1. استنساخ المستودع
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # يجلب التاريخ الكامل (لتجنب مشاكل الدفع)
 
-      - name: 🐍 تنصيب بايثون
+      - name: 🐍 2. تنصيب بايثون
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: 📦 تنصيب المكتبات
+      - name: 📦 3. تنصيب مكتبات بايثون
         run: pip install requests
 
-      - name: 🚀 تشغيل سكريبت الكشط
+      - name: 🚀 4. تشغيل سكريبت الكشط (scraper.py)
         run: python scraper.py
 
-      - name: 📤 رفع التغييرات للمستودع
+      - name: 📊 5. التحقق من وجود تغييرات
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📤 6. رفع التغييرات إلى المستودع
+        if: steps.check_changes.outputs.changes_detected == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add index.html
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 تحديث تلقائي للسيرفرات $(date +'%Y-%m-%d %H:%M')" && git push)
+          git add index.html stats.json
+          git commit -m "🔄 تحديث تلقائي للسيرفرات - $(date +'%Y-%m-%d %H:%M')"
+          git push
+
+      - name: ✅ 7. تأكيد الانتهاء
+        run: echo "🎉 تم تحديث الموقع بنجاح!"
