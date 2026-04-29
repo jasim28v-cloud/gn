@@ -3,36 +3,40 @@ name: 🔄 Update DOKA Servers (Professional)
 # ==================== المشغلات ====================
 on:
   schedule:
-    # يعمل كل 3 ساعات (يمكنك تغيير التوقيت)
     - cron: '0 */3 * * *'
-  workflow_dispatch:      # يسمح بالتشغيل اليدوي من واجهة GitHub
+  workflow_dispatch:
   push:
-    branches: [ main ]    # يعمل عند رفع تغييرات على الفرع الرئيسي (اختياري)
+    branches: [ main ]
 
-# ==================== الأذونات (مهم جدًا لصلاحية git push) ====================
+# ==================== الأذونات ====================
 permissions:
-  contents: write         # يسمح للـ Workflow بالكتابة في المستودع
+  contents: write
+  pages: write
+  id-token: write
 
 # ==================== المهام ====================
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: 📥 1. استنساخ المستودع
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # يجلب التاريخ الكامل (لتجنب مشاكل الدفع)
+          fetch-depth: 0
 
       - name: 🐍 2. تنصيب بايثون
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: 📦 3. تنصيب مكتبات بايثون
         run: pip install requests
 
-      - name: 🚀 4. تشغيل سكريبت الكشط (scraper.py)
+      - name: 🚀 4. تشغيل سكريبت الكشط
         run: python scraper.py
 
       - name: 📊 5. التحقق من وجود تغييرات
@@ -53,5 +57,19 @@ jobs:
           git commit -m "🔄 تحديث تلقائي للسيرفرات - $(date +'%Y-%m-%d %H:%M')"
           git push
 
-      - name: ✅ 7. تأكيد الانتهاء
-        run: echo "🎉 تم تحديث الموقع بنجاح!"
+      - name: ⚙️ 7. إعداد GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: 📎 8. رفع الملفات للنشر
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: 🚀 9. النشر على GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: ✅ 10. تأكيد الانتهاء
+        run: |
+          echo "🎉 تم تحديث الموقع ونشره بنجاح!"
+          echo "🔗 رابط الموقع: ${{ steps.deployment.outputs.page_url }}"
