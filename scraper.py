@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-DOKA PRO - Exclave Exclusive Edition
-Fetches ONLY: exclave:// protocol links
-Premium Design 2025 - Glassmorphism + Animated + Modern UI
+DOKA PRO - Ultimate Edition 2025
+Fetches: v2nodes + Exclave VPN
+Features: Real Ping, PWA, Glassmorphism, Animated UI
 """
 
 from __future__ import annotations
@@ -11,19 +11,26 @@ from __future__ import annotations
 import json
 import re
 import random
+import socket
+import time
+import subprocess
+import platform
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Final
+from urllib.parse import urlparse
 
 import requests
 
-# ==================== الثوابت والإعدادات ====================
-TELEGRAM_CHANNEL_URL: Final[str] = "https://t.me/s/exclaveVPN"
+# ==================== الثوابت ====================
+V2NODES_URL: Final[str] = "https://t.me/s/v2nodes"
+EXCLAVE_URL: Final[str] = "https://t.me/s/exclaveVPN"
 OUTPUT_FILE: Final[Path] = Path("index.html")
 DATA_FILE: Final[Path] = Path("stats.json")
+MANIFEST_FILE: Final[Path] = Path("manifest.json")
 
 SUPPORTED_PROTOCOLS: Final[tuple[str, ...]] = ("vmess", "vless", "trojan", "ss")
-EXCLAVE_PREFIX: Final[str] = "exclave://"
 
 REQUEST_HEADERS: Final[dict[str, str]] = {
     "User-Agent": (
@@ -31,24 +38,36 @@ REQUEST_HEADERS: Final[dict[str, str]] = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/131.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "ar-IQ,ar;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "ar-IQ,ar;q=0.9,en;q=0.8",
 }
 
 COUNTRY_HINTS: Final[dict[str, str]] = {
     "singapore": "🇸🇬", ".sg": "🇸🇬",
     "germany": "🇩🇪", ".de": "🇩🇪",
     "netherlands": "🇳🇱", ".nl": "🇳🇱",
-    "united states": "🇺🇸", ".us": "🇺🇸",
-    "united kingdom": "🇬🇧", ".uk": "🇬🇧",
+    "united states": "🇺🇸", ".us": "🇺🇸", "usa": "🇺🇸",
+    "united kingdom": "🇬🇧", ".uk": "🇬🇧", "england": "🇬🇧",
     "japan": "🇯🇵", ".jp": "🇯🇵",
     "france": "🇫🇷", ".fr": "🇫🇷",
     "canada": "🇨🇦", ".ca": "🇨🇦",
-    "uae": "🇦🇪", "emirates": "🇦🇪", ".ae": "🇦🇪",
-    "turkey": "🇹🇷", ".tr": "🇹🇷",
     "hong kong": "🇭🇰", ".hk": "🇭🇰",
+    "uae": "🇦🇪", "emirates": "🇦🇪", "dubai": "🇦🇪", ".ae": "🇦🇪",
+    "turkey": "🇹🇷", ".tr": "🇹🇷",
     "india": "🇮🇳", ".in": "🇮🇳",
     "brazil": "🇧🇷", ".br": "🇧🇷",
+    "russia": "🇷🇺", ".ru": "🇷🇺",
+    "australia": "🇦🇺", ".au": "🇦🇺",
+    "south korea": "🇰🇷", ".kr": "🇰🇷", "korea": "🇰🇷",
+    "sweden": "🇸🇪", ".se": "🇸🇪",
+    "norway": "🇳🇴", ".no": "🇳🇴",
+    "italy": "🇮🇹", ".it": "🇮🇹",
+    "spain": "🇪🇸", ".es": "🇪🇸",
+    "poland": "🇵🇱", ".pl": "🇵🇱",
+    "finland": "🇫🇮", ".fi": "🇫🇮",
+    "switzerland": "🇨🇭", ".ch": "🇨🇭",
+    "austria": "🇦🇹", ".at": "🇦🇹",
+    "belgium": "🇧🇪", ".be": "🇧🇪",
 }
 
 PROTOCOL_COLORS: Final[dict[str, str]] = {
@@ -68,24 +87,107 @@ PROTOCOL_ICONS: Final[dict[str, str]] = {
 }
 
 
-# ==================== دوال الجلب والتحليل ====================
-def fetch_telegram_page(url: str) -> str:
-    """جلب محتوى صفحة تيليجرام مع معالجة الأخطاء."""
+# ==================== دوال Ping الحقيقي ====================
+def extract_host_from_url(url: str) -> str | None:
+    """استخراج الهوست من رابط التكوين."""
     try:
-        print("🚀 جاري جلب البيانات من Telegram (Exclave فقط)...")
+        if "://" not in url:
+            return None
+        encoded = url.split("://", 1)[1]
+        if url.startswith("vmess://"):
+            try:
+                import base64
+                decoded = base64.b64decode(encoded).decode("utf-8", errors="ignore")
+                data = json.loads(decoded)
+                return data.get("add", None)
+            except Exception:
+                pass
+        for part in encoded.split("@"):
+            candidate = part.split(":")[0]
+            if "." in candidate and not candidate.startswith(("http", "tcp", "ws", "grpc")):
+                return candidate
+        parsed = urlparse(f"http://{encoded.split('?')[0].split('#')[0]}")
+        return parsed.hostname or None
+    except Exception:
+        return None
+
+
+def real_tcp_ping(host: str, port: int = 443, timeout: float = 2.0) -> int | None:
+    """قياس ping حقيقي عبر TCP."""
+    try:
+        start = time.monotonic()
+        with socket.create_connection((host, port), timeout=timeout):
+            elapsed = (time.monotonic() - start) * 1000
+            return int(elapsed)
+    except Exception:
+        return None
+
+
+def ping_server(url: str, attempts: int = 2) -> tuple[int | None, bool]:
+    """قياس ping لسيرفر مع محاولات متعددة."""
+    host = extract_host_from_url(url)
+    if not host:
+        return None, False
+
+    for _ in range(attempts):
+        result = real_tcp_ping(host, port=443, timeout=2.0)
+        if result is not None:
+            return result, True
+    return None, False
+
+
+def measure_all_pings(servers: list[dict]) -> list[dict]:
+    """قياس ping لكل السيرفرات بالتوازي."""
+    print(f"🧪 جاري فحص {len(servers)} سيرفر حقيقياً...")
+    results = []
+
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = {executor.submit(ping_server, s["url"]): i for i, s in enumerate(servers)}
+        for future in as_completed(futures):
+            idx = futures[future]
+            ping_ms, is_alive = future.result()
+            servers[idx]["ping"] = ping_ms if ping_ms else random.randint(200, 400)
+            servers[idx]["alive"] = is_alive
+            results.append(servers[idx])
+
+        # طبع ملخص
+        alive = sum(1 for s in results if s["alive"])
+        print(f"   ✅ {alive}/{len(results)} سيرفرات حية")
+    return results
+
+
+# ==================== دوال الجلب والتحليل ====================
+def fetch_telegram_page(url: str, name: str = "") -> str:
+    """جلب محتوى صفحة تيليجرام."""
+    print(f"📥 جاري جلب البيانات من {name or url}...")
+    try:
         response = requests.get(url, headers=REQUEST_HEADERS, timeout=30)
         response.raise_for_status()
         return response.text
     except requests.RequestException as exc:
-        print(f"❌ خطأ في جلب الصفحة: {exc}")
+        print(f"❌ خطأ في جلب {name}: {exc}")
         return ""
 
 
-def extract_exclave_links(html_content: str) -> list[str]:
-    """استخراج جميع روابط exclave:// من HTML."""
-    pattern = rf"{EXCLAVE_PREFIX}[^\s<\"'\s]+"
+def extract_v2ray_links(html_content: str) -> list[str]:
+    """استخراج روابط V2Ray من HTML."""
+    protocols = "|".join(SUPPORTED_PROTOCOLS)
+    pattern = rf"(?:{protocols})://[^\s<>\"'\s]+"
     matches = re.findall(pattern, html_content, re.IGNORECASE)
-    # إزالة التكرار مع الحفاظ على الترتيب
+    seen: set[str] = set()
+    clean_links: list[str] = []
+    for link in matches:
+        cleaned = link.replace("&amp;", "&").split("<")[0].split('"')[0].strip()
+        if cleaned not in seen:
+            seen.add(cleaned)
+            clean_links.append(cleaned)
+    return clean_links
+
+
+def extract_exclave_links(html_content: str) -> list[str]:
+    """استخراج روابط exclave:// من HTML."""
+    pattern = r"exclave://[^\s<\"'\s]+"
+    matches = re.findall(pattern, html_content, re.IGNORECASE)
     seen: set[str] = set()
     clean_links: list[str] = []
     for link in matches:
@@ -96,91 +198,148 @@ def extract_exclave_links(html_content: str) -> list[str]:
     return clean_links
 
 
-def extract_protocol_type(link: str) -> str:
-    """استخراج نوع البروتوكول الحقيقي من رابط exclave."""
-    link_lower = link.lower()
-    for proto in SUPPORTED_PROTOCOLS:
-        if f"{EXCLAVE_PREFIX}{proto}" in link_lower:
-            return proto.upper()
+def extract_protocol(url: str) -> str:
+    """استخراج نوع البروتوكول من الرابط."""
+    prefix = url.split("://")[0].lower()
+    if prefix in SUPPORTED_PROTOCOLS:
+        return prefix.upper()
+    if "exclave://" in url.lower():
+        for proto in SUPPORTED_PROTOCOLS:
+            if f"exclave://{proto}" in url.lower():
+                return proto.upper()
     return "UNKNOWN"
 
 
-def detect_country(link: str) -> str:
+def detect_country(url: str) -> str:
     """تخمين الدولة من الرابط."""
-    link_lower = link.lower()
-    # البحث عن اسم الدولة كاملاً أولاً (أكثر دقة)
+    url_lower = url.lower()
     for hint, flag in COUNTRY_HINTS.items():
-        if hint in link_lower:
+        if hint in url_lower:
             return flag
     return "🌍"
 
 
-def classify_servers(links: list[str]) -> dict[str, list[dict[str, str | int]]]:
-    """تصنيف السيرفرات حسب نوع البروتوكول."""
-    classified: dict[str, list[dict[str, str | int]]] = {
-        proto: [] for proto in SUPPORTED_PROTOCOLS
-    }
-    classified["other"] = []
-    all_servers: list[dict[str, str | int]] = []
-
+def build_server_list(links: list[str], source: str) -> list[dict]:
+    """بناء قائمة السيرفرات من الروابط."""
+    servers: list[dict] = []
     for link in links:
-        proto_type = extract_protocol_type(link)
-        country_flag = detect_country(link)
-        ping = random.randint(60, 250)
-
-        server_info = {
-            "link": link,
+        proto_type = extract_protocol(link)
+        servers.append({
+            "url": link,
             "proto": proto_type,
-            "flag": country_flag,
-            "ping": ping,
-        }
-        all_servers.append(server_info)
-
-        proto_key = proto_type.lower()
-        if proto_key in classified:
-            classified[proto_key].append(server_info)
-        else:
-            classified["other"].append(server_info)
-
-    return classified
+            "country": detect_country(link),
+            "ping": random.randint(100, 300),
+            "alive": False,
+            "source": source,
+        })
+    return servers
 
 
-# ==================== توليد HTML بتصميم Exclave الأسطوري ====================
-def generate_html(
-    classified: dict[str, list[dict[str, str | int]]],
-    all_servers: list[dict[str, str | int]],
-) -> str:
-    """توليد صفحة HTML احترافية كاملة لـ Exclave VPN."""
+# ==================== توليد Manifest ====================
+def generate_manifest() -> str:
+    """توليد ملف manifest.json لـ PWA."""
+    manifest = {
+        "name": "DOKA PRO - V2Ray Proxy",
+        "short_name": "DOKA PRO",
+        "description": "حرية التصفح بلا حدود - سيرفرات V2Ray و Exclave محدثة تلقائياً",
+        "start_url": "/index.html",
+        "scope": "/",
+        "display": "standalone",
+        "orientation": "portrait-primary",
+        "background_color": "#0b1120",
+        "theme_color": "#6366f1",
+        "lang": "ar",
+        "dir": "rtl",
+        "categories": ["utilities", "vpn", "proxy"],
+        "icons": [
+            {
+                "src": "data:image/svg+xml," + (
+                    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E"
+                    "%3Cdefs%3E"
+                    "%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E"
+                    "%3Cstop offset='0%25' style='stop-color:%236366f1'/%3E"
+                    "%3Cstop offset='50%25' style='stop-color:%238b5cf6'/%3E"
+                    "%3Cstop offset='100%25' style='stop-color:%23a855f7'/%3E"
+                    "%3C/linearGradient%3E"
+                    "%3C/defs%3E"
+                    "%3Crect width='512' height='512' rx='100' fill='url(%23bg)'/%3E"
+                    "%3Ccircle cx='256' cy='200' r='100' fill='white' opacity='0.15'/%3E"
+                    "%3Ctext x='256' y='310' text-anchor='middle' font-family='Arial,sans-serif' "
+                    "font-size='180' font-weight='bold' fill='white' opacity='0.9'%3E🌐%3C/text%3E"
+                    "%3Ctext x='256' y='400' text-anchor='middle' font-family='Arial,sans-serif' "
+                    "font-size='50' font-weight='bold' fill='white'%3EDOKA%3C/text%3E"
+                    "%3C/svg%3E"
+                ),
+                "sizes": "512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable",
+            }
+        ],
+        "screenshots": [],
+        "shortcuts": [
+            {
+                "name": "VMess",
+                "url": "/?filter=vmess",
+                "icons": [{"src": "data:image/svg+xml,...", "sizes": "96x96"}],
+            },
+            {
+                "name": "VLess",
+                "url": "/?filter=vless",
+            },
+        ],
+    }
+    return json.dumps(manifest, indent=2, ensure_ascii=False)
+
+
+# ==================== توليد HTML ====================
+def generate_html(all_servers: list[dict], total: int) -> str:
+    """توليد صفحة HTML احترافية بآخر صيحات 2025."""
     now = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M")
-    total_servers = len(all_servers)
+    servers_json = json.dumps(all_servers, ensure_ascii=False)
+
+    counts: dict[str, int] = {}
+    for s in all_servers:
+        proto = s["proto"].lower()
+        counts[proto] = counts.get(proto, 0) + 1
+
+    total_v2nodes = sum(1 for s in all_servers if s["source"] == "v2nodes")
+    total_exclave = sum(1 for s in all_servers if s["source"] == "exclave")
 
     # حفظ الإحصائيات
     stats_data = {
         "last_updated": datetime.now(timezone.utc).isoformat(),
-        "total_servers": total_servers,
-        "by_protocol": {
-            key: len(server_list)
-            for key, server_list in classified.items()
-            if server_list
-        },
+        "total_servers": total,
+        "v2nodes": total_v2nodes,
+        "exclave": total_exclave,
+        "alive": sum(1 for s in all_servers if s["alive"]),
+        "by_protocol": counts,
     }
     DATA_FILE.write_text(
         json.dumps(stats_data, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
 
-    servers_json = json.dumps(all_servers, ensure_ascii=False)
-    counts = {
-        proto: len(classified.get(proto, [])) for proto in (*SUPPORTED_PROTOCOLS, "other")
-    }
+    # توليد manifest.json
+    MANIFEST_FILE.write_text(generate_manifest(), encoding="utf-8")
 
     return f"""\
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOKA PRO • Exclave VPN Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DOKA PRO">
+    <meta name="description" content="حرية التصفح بلا حدود - سيرفرات V2Ray و Exclave محدثة تلقائياً">
+    <title>DOKA PRO • V2Ray Freedom Cloud</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,{"%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1'/%3E%3Cstop offset='50%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='100' fill='url(%23bg)'/%3E%3Ctext x='256' y='310' text-anchor='middle' font-size='180' fill='white' opacity='0.9'%3E🌐%3C/text%3E%3Ctext x='256' y='400' text-anchor='middle' font-size='50' font-weight='bold' fill='white'%3EDOKA%3C/text%3E%3C/svg%3E"}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,10 +368,9 @@ def generate_html(
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --info: #3b82f6;
             --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --exclave-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #3730a3 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+            --gradient-exclave: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
@@ -245,6 +403,8 @@ def generate_html(
             color: var(--text);
             min-height: 100vh;
             transition: background var(--transition), color var(--transition);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }}
 
         /* ========== خلفية متحركة ========== */
@@ -315,7 +475,7 @@ def generate_html(
         .navbar-brand {{
             font-size: 1.5rem;
             font-weight: 900;
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -359,7 +519,6 @@ def generate_html(
             justify-content: center;
             font-size: 1.1rem;
             transition: all var(--transition);
-            position: relative;
         }}
         .btn-icon:hover {{
             background: var(--surface-hover);
@@ -390,9 +549,6 @@ def generate_html(
             margin-bottom: 24px;
             box-shadow: var(--shadow-sm);
         }}
-        .hero-badge i {{
-            color: var(--primary);
-        }}
         .hero-title {{
             font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 900;
@@ -401,7 +557,7 @@ def generate_html(
             letter-spacing: -1px;
         }}
         .hero-title .gradient-text {{
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -413,7 +569,13 @@ def generate_html(
             line-height: 1.6;
         }}
 
-        /* ========== Counter Glow Card ========== */
+        /* ========== Counter Cards ========== */
+        .counters-row {{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
         .counter-card {{
             position: relative;
             display: inline-flex;
@@ -422,37 +584,28 @@ def generate_html(
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 32px 64px;
+            padding: 28px 48px;
             box-shadow: var(--shadow-xl);
             transition: all var(--transition);
+            min-width: 160px;
         }}
-        .counter-card::before {{
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            background: var(--exclave-gradient);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity var(--transition);
-        }}
-        .counter-card:hover::before {{
-            opacity: 0.3;
+        .counter-card:hover {{
+            transform: translateY(-4px);
         }}
         .counter-number {{
-            font-size: 5rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1;
         }}
         .counter-label {{
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             font-weight: 600;
-            margin-top: 8px;
+            margin-top: 4px;
         }}
 
         /* ========== Filter Tabs ========== */
@@ -488,16 +641,15 @@ def generate_html(
             display: flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap;
         }}
         .tab-btn:hover {{
             background: var(--bg);
             color: var(--text);
         }}
         .tab-btn.active {{
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }}
         .tab-count {{
             font-size: 0.75rem;
@@ -505,13 +657,9 @@ def generate_html(
             padding: 2px 8px;
             border-radius: 50px;
         }}
-        .tab-btn.active .tab-count {{
-            background: rgba(255,255,255,0.3);
-        }}
         .tab-dot {{
             width: 8px; height: 8px;
             border-radius: 50%;
-            flex-shrink: 0;
         }}
 
         /* ========== Servers Grid ========== */
@@ -527,8 +675,6 @@ def generate_html(
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 20px;
         }}
-
-        /* ========== Server Card ========== */
         .server-card {{
             background: var(--surface);
             border: 1px solid var(--border);
@@ -538,24 +684,11 @@ def generate_html(
             position: relative;
             overflow: hidden;
         }}
-        .server-card::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--exclave-gradient);
-            opacity: 0;
-            transition: opacity var(--transition);
-        }}
         .server-card:hover {{
             box-shadow: var(--shadow-xl);
             transform: translateY(-4px);
             border-color: var(--primary);
         }}
-        .server-card:hover::before {{
-            opacity: 1;
-        }}
-
         .server-card-header {{
             display: flex;
             justify-content: space-between;
@@ -568,17 +701,13 @@ def generate_html(
             gap: 10px;
             flex-wrap: wrap;
         }}
-        .server-flag {{
-            font-size: 2rem;
-            line-height: 1;
-        }}
+        .server-flag {{ font-size: 2rem; line-height: 1; }}
         .server-proto-badge {{
             padding: 4px 12px;
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 700;
             color: white;
-            letter-spacing: 0.5px;
         }}
         .server-status {{
             display: flex;
@@ -591,16 +720,15 @@ def generate_html(
             width: 6px; height: 6px;
             border-radius: 50%;
         }}
-        .status-active {{ background: var(--success); }}
-        .status-inactive {{ background: var(--danger); }}
-
+        .status-alive {{ background: var(--success); }}
+        .status-dead {{ background: var(--danger); }}
         .server-url-box {{
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 14px 16px;
             margin-bottom: 16px;
-            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-family: monospace;
             font-size: 0.78rem;
             color: var(--text-secondary);
             direction: ltr;
@@ -608,12 +736,7 @@ def generate_html(
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            transition: all var(--transition);
         }}
-        .server-card:hover .server-url-box {{
-            border-color: var(--primary);
-        }}
-
         .server-actions {{
             display: flex;
             gap: 8px;
@@ -638,9 +761,6 @@ def generate_html(
             box-shadow: 0 4px 20px var(--primary-glow);
             transform: translateY(-1px);
         }}
-        .btn-copy:active {{
-            transform: scale(0.97);
-        }}
         .btn-qr {{
             width: 48px; height: 48px;
             border-radius: var(--radius-sm);
@@ -659,22 +779,17 @@ def generate_html(
             border-color: var(--primary);
             color: var(--primary);
         }}
-
         .qr-container {{
             margin-top: 16px;
             padding: 20px;
             background: white;
             border-radius: var(--radius-sm);
-            display: flex;
+            display: none;
             justify-content: center;
             border: 2px dashed var(--border);
-            transition: all var(--transition);
-        }}
-        .dark .qr-container {{
-            background: white;
         }}
 
-        /* ========== Toast ========== */
+        /* Toast */
         .toast {{
             position: fixed;
             bottom: 32px;
@@ -685,7 +800,6 @@ def generate_html(
             padding: 14px 28px;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 0.9rem;
             z-index: 1000;
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -699,7 +813,7 @@ def generate_html(
             transform: translateX(-50%) translateY(0);
         }}
 
-        /* ========== Stats Page ========== */
+        /* Stats Page */
         .stats-page {{
             position: relative;
             z-index: 1;
@@ -716,58 +830,34 @@ def generate_html(
             box-shadow: var(--shadow-xl);
         }}
 
-        /* ========== Responsive ========== */
         @media (max-width: 768px) {{
-            .navbar-inner {{
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 12px;
-                padding: 12px 16px;
-            }}
-            .hero-title {{
-                font-size: 2rem;
-            }}
-            .counter-number {{
-                font-size: 3rem;
-            }}
-            .counter-card {{
-                padding: 24px 40px;
-            }}
-            .servers-grid {{
-                grid-template-columns: 1fr;
-            }}
-            .filter-tabs {{
-                gap: 4px;
-                padding: 6px;
-            }}
-            .tab-btn {{
-                padding: 10px 16px;
-                font-size: 0.8rem;
-            }}
+            .navbar-inner {{ flex-wrap:wrap; justify-content:center; gap:12px; padding:12px 16px; }}
+            .hero-title {{ font-size:2rem; }}
+            .counter-number {{ font-size:2.5rem; }}
+            .counter-card {{ padding:20px 32px; min-width:120px; }}
+            .servers-grid {{ grid-template-columns:1fr; }}
+            .tab-btn {{ padding:10px 16px; font-size:0.8rem; }}
         }}
     </style>
 </head>
 <body>
 
-    <!-- خلفية متحركة -->
     <div class="bg-animated">
-        <div class="orb"></div>
-        <div class="orb"></div>
-        <div class="orb"></div>
+        <div class="orb"></div><div class="orb"></div><div class="orb"></div>
     </div>
 
     <!-- شريط التنقل -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <div class="navbar-brand">⬡ DOKA EXCLAVE</div>
+            <div class="navbar-brand">✦ DOKA PRO</div>
             <div class="navbar-stats">
                 <div class="pulse-dot"></div>
-                <span id="status-text">Exclave VPN Cloud</span>
+                <span>🟢 {sum(1 for s in all_servers if s['alive'])}/{total} مباشر</span>
                 <span style="color:var(--text-secondary)">•</span>
                 <span>{now}</span>
             </div>
             <div class="navbar-actions">
-                <button class="btn-icon" id="dark-toggle" aria-label="تبديل الوضع الليلي" title="الوضع الليلي">
+                <button class="btn-icon" id="dark-toggle" title="الوضع الليلي">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
@@ -778,92 +868,68 @@ def generate_html(
     <section class="hero">
         <div class="hero-badge">
             <i class="fas fa-shield-check"></i>
-            <span>حصرياً من Exclave VPN • آخر تحديث: {now}</span>
+            <span>v2nodes + Exclave • تحديث تلقائي كل 3 ساعات</span>
         </div>
         <h1 class="hero-title">
-            <span class="gradient-text">حرية</span> التصفح<br>مع Exclave
+            <span class="gradient-text">حرية</span> التصفح<br>بلا حدود
         </h1>
-        <p class="hero-subtitle" id="hero-subtitle">
-            سيرفرات Exclave VPN الحصرية • مشفرة • سريعة • محدثة تلقائياً كل 3 ساعات
-        </p>
-        <div class="counter-card">
-            <div class="counter-number">{total_servers}</div>
-            <div class="counter-label" id="counter-label">🔰 سيرفر Exclave نشط وجاهز</div>
+        <p class="hero-subtitle">سيرفرات V2Ray و Exclave VPN محدثة تلقائياً • اختر بروتوكولك المفضل وانطلق</p>
+        <div class="counters-row">
+            <div class="counter-card">
+                <div class="counter-number">{total}</div>
+                <div class="counter-label">🔰 إجمالي السيرفرات</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number" style="background:var(--gradient-2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">{total_v2nodes}</div>
+                <div class="counter-label">📡 V2Ray عام</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number" style="background:var(--gradient-exclave); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">{total_exclave}</div>
+                <div class="counter-label">⬡ Exclave حصري</div>
+            </div>
         </div>
     </section>
 
     <!-- فلترة -->
     <section class="filter-section">
-        <div class="filter-tabs" id="filter-tabs">
-            <button class="tab-btn active" data-filter="all">
-                <i class="fas fa-globe"></i> الكل
-                <span class="tab-count">{total_servers}</span>
-            </button>
-            <button class="tab-btn" data-filter="vmess">
-                <span class="tab-dot" style="background:#8b5cf6"></span> VMess
-                <span class="tab-count">{counts['vmess']}</span>
-            </button>
-            <button class="tab-btn" data-filter="vless">
-                <span class="tab-dot" style="background:#06b6d4"></span> VLess
-                <span class="tab-count">{counts['vless']}</span>
-            </button>
-            <button class="tab-btn" data-filter="trojan">
-                <span class="tab-dot" style="background:#f59e0b"></span> Trojan
-                <span class="tab-count">{counts['trojan']}</span>
-            </button>
-            <button class="tab-btn" data-filter="ss">
-                <span class="tab-dot" style="background:#10b981"></span> SS
-                <span class="tab-count">{counts['ss']}</span>
-            </button>
+        <div class="filter-tabs">
+            <button class="tab-btn active" data-filter="all"><i class="fas fa-globe"></i> الكل <span class="tab-count">{total}</span></button>
+            <button class="tab-btn" data-filter="vmess"><span class="tab-dot" style="background:#8b5cf6"></span> VMess <span class="tab-count">{counts.get('vmess', 0)}</span></button>
+            <button class="tab-btn" data-filter="vless"><span class="tab-dot" style="background:#06b6d4"></span> VLess <span class="tab-count">{counts.get('vless', 0)}</span></button>
+            <button class="tab-btn" data-filter="trojan"><span class="tab-dot" style="background:#f59e0b"></span> Trojan <span class="tab-count">{counts.get('trojan', 0)}</span></button>
+            <button class="tab-btn" data-filter="ss"><span class="tab-dot" style="background:#10b981"></span> SS <span class="tab-count">{counts.get('ss', 0)}</span></button>
+            <button class="tab-btn" data-filter="v2nodes">📡 v2nodes <span class="tab-count">{total_v2nodes}</span></button>
+            <button class="tab-btn" data-filter="exclave">⬡ Exclave <span class="tab-count">{total_exclave}</span></button>
         </div>
     </section>
 
     <!-- السيرفرات -->
     <section class="servers-section">
         <div class="servers-grid" id="servers-grid"></div>
-        <div id="no-servers" style="display:none; text-align:center; padding:60px; color:var(--text-secondary); font-size:1.2rem;">
+        <div id="no-servers" style="display:none; text-align:center; padding:60px; color:var(--text-secondary);">
             <i class="fas fa-inbox" style="font-size:3rem; display:block; margin-bottom:16px; opacity:0.3;"></i>
-            <span id="no-servers-text">لا توجد سيرفرات Exclave متاحة حالياً</span>
-        </div>
-    </section>
-
-    <!-- الإحصائيات -->
-    <section class="stats-page" id="stats-page" style="display:none;">
-        <div class="stats-card">
-            <h2 style="font-size:2rem; margin-bottom:8px;">📊 إحصائيات Exclave</h2>
-            <p style="color:var(--text-secondary); margin-bottom:32px;">آخر تحديث: <span id="stats-last-update"></span></p>
-            <canvas id="stats-chart" style="max-height:400px;"></canvas>
-            <button onclick="location.reload()" style="
-                margin-top:32px;
-                padding:14px 40px;
-                border-radius:50px;
-                border:none;
-                background:var(--exclave-gradient);
-                color:white;
-                font-family:'Cairo',sans-serif;
-                font-weight:700;
-                font-size:1rem;
-                cursor:pointer;
-                transition:all 0.3s;
-            ">⬅️ العودة للسيرفرات</button>
+            لا توجد سيرفرات متاحة
         </div>
     </section>
 
     <!-- Footer -->
     <footer style="position:relative; z-index:1; text-align:center; padding:40px 24px; color:var(--text-secondary);">
-        <p style="margin-bottom:16px;">© 2026 <strong>DOKA PRO × Exclave</strong> • جميع الحقوق محفوظة</p>
-        <button id="show-stats-btn" style="
-            background:none; border:none; color:var(--primary); cursor:pointer;
-            font-family:'Cairo',sans-serif; font-weight:600; font-size:0.9rem;
-            text-decoration:underline;
-        ">📊 عرض الإحصائيات التفصيلية</button>
+        <p>© 2026 <strong>DOKA PRO</strong> • جميع الحقوق محفوظة</p>
+        <button id="show-stats-btn" style="background:none; border:none; color:var(--primary); cursor:pointer; font-family:'Cairo',sans-serif; font-weight:600; text-decoration:underline;">📊 الإحصائيات</button>
     </footer>
 
+    <!-- الإحصائيات -->
+    <section class="stats-page" id="stats-page" style="display:none;">
+        <div class="stats-card">
+            <h2 style="font-size:2rem; margin-bottom:8px;">📊 لوحة الإحصائيات</h2>
+            <p style="color:var(--text-secondary); margin-bottom:32px;">آخر تحديث: <span id="stats-last-update"></span></p>
+            <canvas id="stats-chart" style="max-height:400px;"></canvas>
+            <button onclick="location.reload()" style="margin-top:32px; padding:14px 40px; border-radius:50px; border:none; background:var(--gradient-1); color:white; font-family:'Cairo',sans-serif; font-weight:700; cursor:pointer;">⬅️ عودة</button>
+        </div>
+    </section>
+
     <!-- Toast -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle" style="color:#10b981;"></i>
-        <span>تم نسخ رابط Exclave بنجاح!</span>
-    </div>
+    <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10b981;"></i> <span>تم النسخ!</span></div>
 
     <script>
         const serversData = {servers_json};
@@ -872,275 +938,137 @@ def generate_html(
         let currentFilter = 'all';
         let chartInstance = null;
 
-        // ============ الترجمة ============
-        const translations = {{
-            ar: {{
-                counterLabel: '🔰 سيرفر Exclave نشط وجاهز',
-                copy: '📋 نسخ الرابط',
-                active: 'نشط',
-                inactive: 'خامل',
-                noServers: 'لا توجد سيرفرات Exclave متاحة حالياً',
-                statusAll: 'Exclave VPN Cloud',
-                toast: 'تم نسخ رابط Exclave بنجاح!',
-                qrTitle: '📱 امسح الكود',
-            }},
-            en: {{
-                counterLabel: '🔰 Active Exclave Servers',
-                copy: '📋 Copy Link',
-                active: 'Active',
-                inactive: 'Inactive',
-                noServers: 'No Exclave servers available',
-                statusAll: 'Exclave VPN Cloud',
-                toast: 'Exclave link copied!',
-                qrTitle: '📱 Scan QR',
-            }}
-        }};
-        let currentLang = 'ar';
-
-        function t(key) {{
-            return translations[currentLang][key] || key;
-        }}
-
-        // ============ Dark Mode ============
+        // Dark Mode
         const darkToggle = document.getElementById('dark-toggle');
         darkToggle.addEventListener('click', () => {{
             document.body.classList.toggle('dark');
-            const icon = darkToggle.querySelector('i');
-            if (document.body.classList.contains('dark')) {{
-                icon.className = 'fas fa-sun';
-                localStorage.setItem('doka-exclave-dark', 'true');
-            }} else {{
-                icon.className = 'fas fa-moon';
-                localStorage.setItem('doka-exclave-dark', 'false');
-            }}
+            darkToggle.querySelector('i').className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('doka-dark', document.body.classList.contains('dark') ? 'true' : 'false');
         }});
-        if (localStorage.getItem('doka-exclave-dark') === 'true') {{
+        if (localStorage.getItem('doka-dark') === 'true') {{
             document.body.classList.add('dark');
             darkToggle.querySelector('i').className = 'fas fa-sun';
         }}
 
-        // ============ عرض البطاقات ============
+        // عرض البطاقات
         function renderCards(filter) {{
             const grid = document.getElementById('servers-grid');
             const noMsg = document.getElementById('no-servers');
-            const noMsgText = document.getElementById('no-servers-text');
-
-            const filtered = filter === 'all'
-                ? serversData
-                : serversData.filter(s => s.proto.toLowerCase() === filter);
-
-            if (filtered.length === 0) {{
-                grid.innerHTML = '';
-                noMsgText.innerText = t('noServers');
-                noMsg.style.display = 'block';
-                return;
-            }}
-
+            let filtered = filter === 'all' ? serversData : serversData.filter(s => {{
+                if (filter === 'v2nodes' || filter === 'exclave') return s.source === filter;
+                return s.proto.toLowerCase() === filter;
+            }});
+            if (filtered.length === 0) {{ grid.innerHTML = ''; noMsg.style.display = 'block'; return; }}
             noMsg.style.display = 'none';
-            const isActiveMap = new Map();
-
             let html = '';
-            filtered.forEach((server, i) => {{
-                if (!isActiveMap.has(server.link)) {{
-                    isActiveMap.set(server.link, Math.random() > 0.1);
-                }}
-                const isActive = isActiveMap.get(server.link);
-                const shortLink = server.link.length > 70
-                    ? server.link.substring(0, 68) + '...'
-                    : server.link;
-                const protoColor = PROTOCOL_COLORS[server.proto.toLowerCase()] || '#6366f1';
-                const protoIcon = PROTOCOL_ICONS[server.proto.toLowerCase()] || 'fa-cube';
-                const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? t('active') : t('inactive');
-                const statusColor = isActive ? 'var(--success)' : 'var(--danger)';
-
+            filtered.forEach((s, i) => {{
+                const short = s.url.length > 65 ? s.url.substring(0, 63)+'...' : s.url;
+                const protoColor = PROTOCOL_COLORS[s.proto.toLowerCase()] || '#6366f1';
+                const protoIcon = PROTOCOL_ICONS[s.proto.toLowerCase()] || 'fa-cube';
+                const alive = s.alive;
+                const pingDisplay = alive ? s.ping+'ms' : 'ميت';
+                const statusClass = alive ? 'status-alive' : 'status-dead';
+                const statusColor = alive ? 'var(--success)' : 'var(--danger)';
                 html += `
                 <div class="server-card">
                     <div class="server-card-header">
                         <div class="server-info">
-                            <span class="server-flag">${{server.flag}}</span>
-                            <span class="server-proto-badge" style="background:${{protoColor}}">
-                                <i class="fas ${{protoIcon}}"></i> ${{server.proto}}
-                            </span>
-                            <span class="server-status" style="color:${{statusColor}}">
-                                <span class="status-dot ${{statusClass}}"></span>
-                                ${{statusText}}
-                            </span>
+                            <span class="server-flag">${{s.country}}</span>
+                            <span class="server-proto-badge" style="background:${{protoColor}}"><i class="fas ${{protoIcon}}"></i> ${{s.proto}}</span>
+                            <span class="server-status" style="color:${{statusColor}}"><span class="status-dot ${{statusClass}}"></span> ${{alive?'حي':'ميت'}}</span>
+                            <span style="font-size:0.7rem; color:${{s.source==='exclave'?'#a855f7':'var(--text-secondary)'}};">${{s.source==='exclave'?'⬡':''}}</span>
                         </div>
-                        <span style="font-size:0.8rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px;">
-                            <i class="fas fa-tachometer-alt"></i> ${{server.ping}}ms
-                        </span>
+                        <span style="font-size:0.8rem; color:var(--text-secondary);">${{pingDisplay}}</span>
                     </div>
-                    <div class="server-url-box">${{shortLink}}</div>
+                    <div class="server-url-box">${{short}}</div>
                     <div class="server-actions">
-                        <button class="btn-copy" onclick="copyToClipboard('${{server.link.replace(/'/g, "\\'")}}')" style="background:${{protoColor}}">
-                            <i class="far fa-copy"></i> ${{t('copy')}}
-                        </button>
-                        <button class="btn-qr" onclick="toggleQR('qr${{i}}', '${{server.link.replace(/'/g, "\\'")}}')" title="${{t('qrTitle')}}">
-                            <i class="fas fa-qrcode"></i>
-                        </button>
+                        <button class="btn-copy" onclick="copyText('${{s.url.replace(/'/g, "\\'")}}')" style="background:${{protoColor}}"><i class="far fa-copy"></i> نسخ</button>
+                        <button class="btn-qr" onclick="toggleQR('q${{i}}','${{s.url.replace(/'/g, "\\'")}}')"><i class="fas fa-qrcode"></i></button>
                     </div>
-                    <div id="qr${{i}}" class="qr-container" style="display:none;"></div>
+                    <div class="qr-container" id="q${{i}}"></div>
                 </div>`;
             }});
             grid.innerHTML = html;
         }}
 
-        // ============ نسخ النص ============
-        window.copyToClipboard = (text) => {{
-            navigator.clipboard.writeText(text).then(() => {{
-                showToast();
-            }}).catch(() => {{
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.cssText = 'position:fixed;opacity:0;';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                showToast();
-            }});
-        }};
+        window.copyText = t => {{ navigator.clipboard.writeText(t).then(()=>{{const toast=document.getElementById('toast');toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2500);}}).catch(()=>{{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);const toast=document.getElementById('toast');toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2500);}}); }};
+        window.toggleQR = (id, link) => {{ const el = document.getElementById(id); if (el.style.display !== 'flex') {{ if (!el.innerHTML) new QRCode(el, {{text:link, width:180, height:180, colorDark:'#1e293b', colorLight:'#ffffff'}}); el.style.display = 'flex'; el.scrollIntoView({{behavior:'smooth',block:'nearest'}}); }} else {{ el.style.display = 'none'; }} }};
 
-        function showToast() {{
-            const toast = document.getElementById('toast');
-            toast.querySelector('span').innerText = t('toast');
-            toast.classList.add('show');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
-        }}
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {{
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderCards(currentFilter);
+        }}));
 
-        // ============ QR Code ============
-        window.toggleQR = (id, link) => {{
-            const el = document.getElementById(id);
-            if (el.style.display === 'none') {{
-                if (!el.innerHTML) {{
-                    new QRCode(el, {{
-                        text: link,
-                        width: 180,
-                        height: 180,
-                        colorDark: '#1e293b',
-                        colorLight: '#ffffff',
-                    }});
-                }}
-                el.style.display = 'flex';
-                el.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
-            }} else {{
-                el.style.display = 'none';
-            }}
-        }};
-
-        // ============ الفلترة ============
-        document.querySelectorAll('.tab-btn').forEach(btn => {{
-            btn.addEventListener('click', () => {{
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderCards(currentFilter);
-            }});
-        }});
-
-        // ============ الإحصائيات ============
         document.getElementById('show-stats-btn').addEventListener('click', async () => {{
-            document.querySelector('.navbar').style.display = 'none';
-            document.querySelector('.hero').style.display = 'none';
-            document.querySelector('.filter-section').style.display = 'none';
-            document.querySelector('.servers-section').style.display = 'none';
-            document.querySelector('footer').style.display = 'none';
-            document.getElementById('stats-page').style.display = 'block';
-
+            document.querySelector('.navbar').style.display='none';
+            document.querySelector('.hero').style.display='none';
+            document.querySelector('.filter-section').style.display='none';
+            document.querySelector('.servers-section').style.display='none';
+            document.querySelector('footer').style.display='none';
+            document.getElementById('stats-page').style.display='block';
             try {{
                 const res = await fetch('stats.json');
-                if (!res.ok) throw new Error();
                 const stats = await res.json();
-                document.getElementById('stats-last-update').innerText =
-                    new Date(stats.last_updated).toLocaleString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-
+                document.getElementById('stats-last-update').innerText = new Date(stats.last_updated).toLocaleString('ar-SA');
                 const ctx = document.getElementById('stats-chart').getContext('2d');
-                if (chartInstance) chartInstance.destroy();
-
-                const labels = Object.keys(stats.by_protocol).map(p => p.toUpperCase());
-                const data = Object.values(stats.by_protocol);
-                const colors = labels.map(l => PROTOCOL_COLORS[l.toLowerCase()] || '#6366f1');
-
+                if(chartInstance) chartInstance.destroy();
+                const labels = Object.keys(stats.by_protocol).map(p=>p.toUpperCase());
                 chartInstance = new Chart(ctx, {{
-                    type: 'doughnut',
-                    data: {{
-                        labels: labels,
-                        datasets: [{{
-                            data: data,
-                            backgroundColor: colors,
-                            borderColor: document.body.classList.contains('dark') ? '#1a2332' : '#ffffff',
-                            borderWidth: 4,
-                            hoverBorderWidth: 6,
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {{
-                            legend: {{
-                                position: 'bottom',
-                                labels: {{
-                                    padding: 20,
-                                    font: {{ family: 'Cairo', size: 14 }},
-                                    color: document.body.classList.contains('dark') ? '#e2e8f0' : '#1e293b',
-                                }}
-                            }}
-                        }},
-                    }}
+                    type:'doughnut',
+                    data:{{ labels, datasets:[{{ data:Object.values(stats.by_protocol), backgroundColor:labels.map(l=>PROTOCOL_COLORS[l.toLowerCase()]||'#6366f1'), borderColor:document.body.classList.contains('dark')?'#1a2332':'#fff', borderWidth:4 }}] }},
+                    options:{{ responsive:true, plugins:{{ legend:{{ position:'bottom', labels:{{ padding:20, font:{{family:'Cairo',size:14}} }} }} }} }}
                 }});
-            }} catch (err) {{
-                console.error(err);
-                document.getElementById('stats-last-update').innerText = '—';
-            }}
+            }} catch(e) {{ console.error(e); }}
         }});
 
-        // ============ تحميل أولي ============
         renderCards('all');
-
-        console.log('%c⬡ DOKA EXCLAVE %cExclusive Edition %cReady',
-            'color:#6366f1;font-size:2rem;font-weight:900;',
-            'color:#a855f7;font-size:1rem;',
-            'color:#10b981;');
-        console.log('%cTotal: %c{total_servers} %cExclave servers loaded',
-            'color:#64748b;', 'color:#6366f1;font-weight:bold;', 'color:#64748b;');
+        console.log('%c🚀 DOKA PRO %cUltimate %cReady', 'color:#6366f1;font-size:2rem;font-weight:900;', 'color:#a855f7;', 'color:#10b981;');
+        console.log('%cTotal:%c {total} %cservers', 'color:#64748b;', 'color:#6366f1;font-weight:bold;', 'color:#64748b;');
     </script>
 </body>
 </html>"""
 
 
 # ==================== الدالة الرئيسية ====================
-def run_doka_exclave() -> None:
-    """الدالة الرئيسية لتشغيل سكريبت DOKA Exclave."""
-    html_content = fetch_telegram_page(TELEGRAM_CHANNEL_URL)
-    if not html_content:
-        print("⚠️ تعذّر جلب الصفحة. تأكد من اتصالك بالإنترنت.")
+def main() -> None:
+    """تشغيل DOKA PRO Ultimate Edition."""
+    print("🚀 DOKA PRO - Ultimate Edition 2025")
+    print("=" * 50)
+
+    # جلب البيانات
+    v2nodes_html = fetch_telegram_page(V2NODES_URL, "v2nodes")
+    exclave_html = fetch_telegram_page(EXCLAVE_URL, "Exclave VPN")
+
+    # استخراج الروابط
+    v2nodes_links = extract_v2ray_links(v2nodes_html) if v2nodes_html else []
+    exclave_links = extract_exclave_links(exclave_html) if exclave_html else []
+    print(f"📊 v2nodes: {len(v2nodes_links)} | Exclave: {len(exclave_links)}")
+
+    # بناء قائمة السيرفرات
+    all_servers = build_server_list(v2nodes_links, "v2nodes")
+    all_servers += build_server_list(exclave_links, "exclave")
+
+    if not all_servers:
+        print("⚠️ لا توجد سيرفرات!")
         return
 
-    clean_links = extract_exclave_links(html_content)
-    print(f"✅ تم العثور على {len(clean_links)} رابط Exclave.")
+    # قياس الـ ping الحقيقي
+    all_servers = measure_all_pings(all_servers)
 
-    if not clean_links:
-        print("⚠️ لم يتم العثور على أي روابط Exclave. قد تكون القناة فارغة حالياً.")
-        return
-
-    classified = classify_servers(clean_links)
-    html_output = generate_html(classified, list({
-        s["link"]: s for inner in classified.values() for s in inner
-    }.values()))
+    # توليد HTML
+    total = len(all_servers)
+    alive_count = sum(1 for s in all_servers if s["alive"])
+    html_output = generate_html(all_servers, total)
 
     OUTPUT_FILE.write_text(html_output, encoding="utf-8")
-    total_servers = sum(len(server_list) for server_list in classified.values())
-
-    print(f"🎉 [DOKA EXCLAVE] تم بنجاح! عدد السيرفرات: {total_servers}")
-    print(f"   • VMess:     {len(classified.get('vmess', []))}")
-    print(f"   • VLess:     {len(classified.get('vless', []))}")
-    print(f"   • Trojan:   {len(classified.get('trojan', []))}")
-    print(f"   • SS:        {len(classified.get('ss', []))}")
-    if classified.get("other"):
-        print(f"   • Other:     {len(classified['other'])}")
+    print(f"\n🎉 تم! {total} سيرفر ({alive_count} حي)")
+    print(f"   • v2nodes: {sum(1 for s in all_servers if s['source']=='v2nodes')}")
+    print(f"   • Exclave: {sum(1 for s in all_servers if s['source']=='exclave')}")
+    print(f"   • PWA: جاهز للتثبيت")
+    print(f"   • Ping: حقيقي ✅")
 
 
 if __name__ == "__main__":
-    run_doka_exclave()
+    main()
