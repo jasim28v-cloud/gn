@@ -1,302 +1,1146 @@
-# scraper.py - DOKA Exclave Exclusive Edition
-import requests
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+DOKA PRO - Exclave Exclusive Edition
+Fetches ONLY: exclave:// protocol links
+Premium Design 2025 - Glassmorphism + Animated + Modern UI
+"""
+
+from __future__ import annotations
+
+import json
 import re
 import random
-import json
-from datetime import datetime
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Final
 
-def run_doka_exclave():
-    url = "https://t.me/s/exclaveVPN"
-    
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'ar-IQ,ar;q=0.9,en-US;q=0.8,en;q=0.7',
-    }
-    
+import requests
+
+# ==================== الثوابت والإعدادات ====================
+TELEGRAM_CHANNEL_URL: Final[str] = "https://t.me/s/exclaveVPN"
+OUTPUT_FILE: Final[Path] = Path("index.html")
+DATA_FILE: Final[Path] = Path("stats.json")
+
+SUPPORTED_PROTOCOLS: Final[tuple[str, ...]] = ("vmess", "vless", "trojan", "ss")
+EXCLAVE_PREFIX: Final[str] = "exclave://"
+
+REQUEST_HEADERS: Final[dict[str, str]] = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "ar-IQ,ar;q=0.9,en-US;q=0.8,en;q=0.7",
+}
+
+COUNTRY_HINTS: Final[dict[str, str]] = {
+    "singapore": "🇸🇬", ".sg": "🇸🇬",
+    "germany": "🇩🇪", ".de": "🇩🇪",
+    "netherlands": "🇳🇱", ".nl": "🇳🇱",
+    "united states": "🇺🇸", ".us": "🇺🇸",
+    "united kingdom": "🇬🇧", ".uk": "🇬🇧",
+    "japan": "🇯🇵", ".jp": "🇯🇵",
+    "france": "🇫🇷", ".fr": "🇫🇷",
+    "canada": "🇨🇦", ".ca": "🇨🇦",
+    "uae": "🇦🇪", "emirates": "🇦🇪", ".ae": "🇦🇪",
+    "turkey": "🇹🇷", ".tr": "🇹🇷",
+    "hong kong": "🇭🇰", ".hk": "🇭🇰",
+    "india": "🇮🇳", ".in": "🇮🇳",
+    "brazil": "🇧🇷", ".br": "🇧🇷",
+}
+
+PROTOCOL_COLORS: Final[dict[str, str]] = {
+    "vmess": "#8b5cf6",
+    "vless": "#06b6d4",
+    "trojan": "#f59e0b",
+    "ss": "#10b981",
+    "unknown": "#6366f1",
+}
+
+PROTOCOL_ICONS: Final[dict[str, str]] = {
+    "vmess": "fa-bolt",
+    "vless": "fa-feather",
+    "trojan": "fa-shield-haltered",
+    "ss": "fa-ghost",
+    "unknown": "fa-cube",
+}
+
+
+# ==================== دوال الجلب والتحليل ====================
+def fetch_telegram_page(url: str) -> str:
+    """جلب محتوى صفحة تيليجرام مع معالجة الأخطاء."""
     try:
         print("🚀 جاري جلب البيانات من Telegram (Exclave فقط)...")
-        response = requests.get(url, headers=headers, timeout=30)
-        
-        # البحث فقط عن الروابط التي تبدأ بـ exclave://
-        pattern = r'exclave://[^\s<"\'\s]+'
-        links = re.findall(pattern, response.text, re.IGNORECASE)
-        clean_links = list(dict.fromkeys([l.replace('&amp;', '&').strip() for l in links]))
-        
-        print(f"✅ تم العثور على {len(clean_links)} رابط Exclave.")
-        
-        # تجميع السيرفرات حسب النوع الحقيقي
-        servers_by_protocol = {
-            "vmess": [], "vless": [], "trojan": [], "ss": []
-        }
-        all_servers_data = []
-        
-        for link in clean_links:
-            link_lower = link.lower()
-            
-            # استخراج النوع الحقيقي من الرابط (ما بعد exclave://)
-            # مثال: exclave://vmess... → النوع هو vmess
-            proto_type = "unknown"
-            if "exclave://vmess" in link_lower:
-                proto_type = "VMESS"
-            elif "exclave://vless" in link_lower:
-                proto_type = "VLESS"
-            elif "exclave://trojan" in link_lower:
-                proto_type = "TROJAN"
-            elif "exclave://ss" in link_lower:
-                proto_type = "SS"
-            else:
-                # إذا لم نتعرف على النوع، نستخدم Exclave كاسم عام
-                proto_type = "EXCLAVE"
-            
-            proto_key = proto_type.lower()
-            if proto_key not in servers_by_protocol:
-                # إذا كان النوع غير متوقع، نضعه في other
-                if "other" not in servers_by_protocol:
-                    servers_by_protocol["other"] = []
-                proto_key = "other"
-            
-            # تخمين الدولة
-            country_flag = "🌍"
-            if "singapore" in link_lower or ".sg" in link_lower: country_flag = "🇸🇬"
-            elif "germany" in link_lower or ".de" in link_lower: country_flag = "🇩🇪"
-            elif "netherlands" in link_lower or ".nl" in link_lower: country_flag = "🇳🇱"
-            elif "united states" in link_lower or ".us" in link_lower: country_flag = "🇺🇸"
-            elif "united kingdom" in link_lower or ".uk" in link_lower: country_flag = "🇬🇧"
-            elif "japan" in link_lower or ".jp" in link_lower: country_flag = "🇯🇵"
-            elif "france" in link_lower or ".fr" in link_lower: country_flag = "🇫🇷"
-            elif "canada" in link_lower or ".ca" in link_lower: country_flag = "🇨🇦"
-            
-            ping = random.randint(60, 250)
-            server_info = {
-                "link": link,
-                "proto": proto_type,
-                "flag": country_flag,
-                "ping": ping
-            }
-            all_servers_data.append(server_info)
-            
-            if proto_key in servers_by_protocol:
-                servers_by_protocol[proto_key].append(server_info)
-            else:
-                servers_by_protocol["other"].append(server_info)
+        response = requests.get(url, headers=REQUEST_HEADERS, timeout=30)
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as exc:
+        print(f"❌ خطأ في جلب الصفحة: {exc}")
+        return ""
 
-        total_servers = len(all_servers_data)
-        
-        # حفظ الإحصائيات
-        stats_data = {
-            "last_updated": datetime.now().isoformat(),
-            "total_servers": total_servers,
-            "by_protocol": {k: len(v) for k, v in servers_by_protocol.items()}
+
+def extract_exclave_links(html_content: str) -> list[str]:
+    """استخراج جميع روابط exclave:// من HTML."""
+    pattern = rf"{EXCLAVE_PREFIX}[^\s<\"'\s]+"
+    matches = re.findall(pattern, html_content, re.IGNORECASE)
+    # إزالة التكرار مع الحفاظ على الترتيب
+    seen: set[str] = set()
+    clean_links: list[str] = []
+    for link in matches:
+        cleaned = link.replace("&amp;", "&").strip()
+        if cleaned not in seen:
+            seen.add(cleaned)
+            clean_links.append(cleaned)
+    return clean_links
+
+
+def extract_protocol_type(link: str) -> str:
+    """استخراج نوع البروتوكول الحقيقي من رابط exclave."""
+    link_lower = link.lower()
+    for proto in SUPPORTED_PROTOCOLS:
+        if f"{EXCLAVE_PREFIX}{proto}" in link_lower:
+            return proto.upper()
+    return "UNKNOWN"
+
+
+def detect_country(link: str) -> str:
+    """تخمين الدولة من الرابط."""
+    link_lower = link.lower()
+    # البحث عن اسم الدولة كاملاً أولاً (أكثر دقة)
+    for hint, flag in COUNTRY_HINTS.items():
+        if hint in link_lower:
+            return flag
+    return "🌍"
+
+
+def classify_servers(links: list[str]) -> dict[str, list[dict[str, str | int]]]:
+    """تصنيف السيرفرات حسب نوع البروتوكول."""
+    classified: dict[str, list[dict[str, str | int]]] = {
+        proto: [] for proto in SUPPORTED_PROTOCOLS
+    }
+    classified["other"] = []
+    all_servers: list[dict[str, str | int]] = []
+
+    for link in links:
+        proto_type = extract_protocol_type(link)
+        country_flag = detect_country(link)
+        ping = random.randint(60, 250)
+
+        server_info = {
+            "link": link,
+            "proto": proto_type,
+            "flag": country_flag,
+            "ping": ping,
         }
-        with open("stats.json", "w", encoding="utf-8") as f:
-            json.dump(stats_data, f)
-        
-        servers_json = json.dumps(all_servers_data, ensure_ascii=False)
-        
-        # ========== قالب HTML (نفس السابق مع تعديل بسيط) ==========
-        html = f'''<!DOCTYPE html>
+        all_servers.append(server_info)
+
+        proto_key = proto_type.lower()
+        if proto_key in classified:
+            classified[proto_key].append(server_info)
+        else:
+            classified["other"].append(server_info)
+
+    return classified
+
+
+# ==================== توليد HTML بتصميم Exclave الأسطوري ====================
+def generate_html(
+    classified: dict[str, list[dict[str, str | int]]],
+    all_servers: list[dict[str, str | int]],
+) -> str:
+    """توليد صفحة HTML احترافية كاملة لـ Exclave VPN."""
+    now = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M")
+    total_servers = len(all_servers)
+
+    # حفظ الإحصائيات
+    stats_data = {
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "total_servers": total_servers,
+        "by_protocol": {
+            key: len(server_list)
+            for key, server_list in classified.items()
+            if server_list
+        },
+    }
+    DATA_FILE.write_text(
+        json.dumps(stats_data, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    servers_json = json.dumps(all_servers, ensure_ascii=False)
+    counts = {
+        proto: len(classified.get(proto, [])) for proto in (*SUPPORTED_PROTOCOLS, "other")
+    }
+
+    return f"""\
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOKA - Exclave Servers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>DOKA PRO • Exclave VPN Cloud</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <style>
-        body {{ font-family: 'Tajawal', sans-serif; background: #fafafa; }}
-        .hero-gradient {{ background: radial-gradient(circle at 70% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 60%); }}
-        .dark {{ background: #0f172a; color: #e2e8f0; }}
-        .dark .bg-white {{ background: #1e293b !important; }}
-        .dark .text-gray-800 {{ color: #e2e8f0 !important; }}
-        .dark .border-gray-100, .dark .border-gray-200 {{ border-color: #334155 !important; }}
-        .tab-btn.active {{ background: #2563eb; color: white; }}
+        :root {{
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --surface-hover: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --exclave-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #3730a3 100%);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+
+        .dark {{
+            --bg: #0b1120;
+            --surface: #1a2332;
+            --surface-hover: #1f2a3a;
+            --border: #2a3a4f;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6);
+        }}
+
+        * {{ margin:0; padding:0; box-sizing:border-box; }}
+
+        body {{
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background var(--transition), color var(--transition);
+        }}
+
+        /* ========== خلفية متحركة ========== */
+        .bg-animated {{
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }}
+        .bg-animated .orb {{
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            animation: float 20s ease-in-out infinite;
+        }}
+        .bg-animated .orb:nth-child(1) {{
+            width: 600px; height: 600px;
+            background: #6366f1;
+            top: -200px; left: -100px;
+            animation-delay: 0s;
+        }}
+        .bg-animated .orb:nth-child(2) {{
+            width: 500px; height: 500px;
+            background: #8b5cf6;
+            bottom: -150px; right: -100px;
+            animation-delay: -5s;
+            animation-duration: 25s;
+        }}
+        .bg-animated .orb:nth-child(3) {{
+            width: 350px; height: 350px;
+            background: #a855f7;
+            top: 50%; left: 50%;
+            animation-delay: -10s;
+            animation-duration: 30s;
+        }}
+
+        @keyframes float {{
+            0%, 100% {{ transform: translate(0, 0) scale(1); }}
+            33% {{ transform: translate(50px, -50px) scale(1.1); }}
+            66% {{ transform: translate(-30px, 30px) scale(0.9); }}
+        }}
+
+        /* ========== شريط التنقل ========== */
+        .navbar {{
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            max-width: 1400px;
+            margin: 16px auto 0;
+            padding: 0 24px;
+        }}
+        .navbar-inner {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition);
+        }}
+        .navbar-brand {{
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: var(--exclave-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }}
+        .navbar-stats {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }}
+        .navbar-stats .pulse-dot {{
+            width: 8px; height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }}
+        @keyframes pulse {{
+            0%, 100% {{ box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }}
+            50% {{ box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }}
+        }}
+        .navbar-actions {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        .btn-icon {{
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all var(--transition);
+            position: relative;
+        }}
+        .btn-icon:hover {{
+            background: var(--surface-hover);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }}
+
+        /* ========== Hero Section ========== */
+        .hero {{
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 60px 24px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }}
+        .hero-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }}
+        .hero-badge i {{
+            color: var(--primary);
+        }}
+        .hero-title {{
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }}
+        .hero-title .gradient-text {{
+            background: var(--exclave-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }}
+        .hero-subtitle {{
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }}
+
+        /* ========== Counter Glow Card ========== */
+        .counter-card {{
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 64px;
+            box-shadow: var(--shadow-xl);
+            transition: all var(--transition);
+        }}
+        .counter-card::before {{
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: var(--exclave-gradient);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }}
+        .counter-card:hover::before {{
+            opacity: 0.3;
+        }}
+        .counter-number {{
+            font-size: 5rem;
+            font-weight: 900;
+            background: var(--exclave-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }}
+        .counter-label {{
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 8px;
+        }}
+
+        /* ========== Filter Tabs ========== */
+        .filter-section {{
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }}
+        .filter-tabs {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 8px;
+            box-shadow: var(--shadow-md);
+        }}
+        .tab-btn {{
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }}
+        .tab-btn:hover {{
+            background: var(--bg);
+            color: var(--text);
+        }}
+        .tab-btn.active {{
+            background: var(--exclave-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }}
+        .tab-count {{
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 50px;
+        }}
+        .tab-btn.active .tab-count {{
+            background: rgba(255,255,255,0.3);
+        }}
+        .tab-dot {{
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }}
+
+        /* ========== Servers Grid ========== */
+        .servers-section {{
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }}
+        .servers-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }}
+
+        /* ========== Server Card ========== */
+        .server-card {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }}
+        .server-card::before {{
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--exclave-gradient);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }}
+        .server-card:hover {{
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }}
+        .server-card:hover::before {{
+            opacity: 1;
+        }}
+
+        .server-card-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }}
+        .server-info {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }}
+        .server-flag {{
+            font-size: 2rem;
+            line-height: 1;
+        }}
+        .server-proto-badge {{
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }}
+        .server-status {{
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }}
+        .status-dot {{
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }}
+        .status-active {{ background: var(--success); }}
+        .status-inactive {{ background: var(--danger); }}
+
+        .server-url-box {{
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            direction: ltr;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: all var(--transition);
+        }}
+        .server-card:hover .server-url-box {{
+            border-color: var(--primary);
+        }}
+
+        .server-actions {{
+            display: flex;
+            gap: 8px;
+        }}
+        .btn-copy {{
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }}
+        .btn-copy:hover {{
+            box-shadow: 0 4px 20px var(--primary-glow);
+            transform: translateY(-1px);
+        }}
+        .btn-copy:active {{
+            transform: scale(0.97);
+        }}
+        .btn-qr {{
+            width: 48px; height: 48px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+        }}
+        .btn-qr:hover {{
+            background: var(--bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }}
+
+        .qr-container {{
+            margin-top: 16px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: center;
+            border: 2px dashed var(--border);
+            transition: all var(--transition);
+        }}
+        .dark .qr-container {{
+            background: white;
+        }}
+
+        /* ========== Toast ========== */
+        .toast {{
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        .toast.show {{
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }}
+
+        /* ========== Stats Page ========== */
+        .stats-page {{
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 24px;
+            text-align: center;
+        }}
+        .stats-card {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+        }}
+
+        /* ========== Responsive ========== */
+        @media (max-width: 768px) {{
+            .navbar-inner {{
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+                padding: 12px 16px;
+            }}
+            .hero-title {{
+                font-size: 2rem;
+            }}
+            .counter-number {{
+                font-size: 3rem;
+            }}
+            .counter-card {{
+                padding: 24px 40px;
+            }}
+            .servers-grid {{
+                grid-template-columns: 1fr;
+            }}
+            .filter-tabs {{
+                gap: 4px;
+                padding: 6px;
+            }}
+            .tab-btn {{
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }}
+        }}
     </style>
 </head>
-<body class="antialiased text-gray-800" id="main-body">
+<body>
 
-    <header class="border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center text-sm">
-            <div class="flex items-center gap-3 text-gray-600">
-                <i class="fas fa-map-marker-alt text-blue-600"></i>
-                <span>IP: <span id="user-ip" class="font-mono font-medium text-gray-900">...</span></span>
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                <span class="text-xs font-bold text-red-500">غير محمي</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button id="dark-mode-toggle" class="text-gray-500 hover:text-gray-700"><i class="fas fa-moon"></i></button>
-                <div class="text-gray-500"><i class="far fa-clock"></i> <span id="update-time">{datetime.now().strftime("%H:%M")}</span></div>
-            </div>
-        </div>
-    </header>
-
-    <section class="hero-gradient relative overflow-hidden border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 text-center">
-            <h1 class="text-4xl md:text-6xl font-black mb-6 text-gray-900 leading-tight">حرية التصفح <br> مع سيرفرات Exclave</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-12">سيرفرات حصرية من Exclave VPN - سريعة، آمنة، ومحدثة تلقائياً.</p>
-            <div class="flex justify-center">
-                <div class="bg-white border border-gray-200 rounded-3xl px-10 py-5 shadow-sm inline-flex items-center gap-4">
-                    <span class="text-6xl font-black text-blue-600" id="total-servers-count">{total_servers}</span>
-                    <span class="text-gray-500 leading-tight text-right">سيرفر<br>Exclave نشط</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-4 py-8">
-        <div class="flex flex-wrap justify-center gap-2" id="filter-tabs">
-            <button class="tab-btn active px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium" data-filter="all">الكل (<span id="count-all">{total_servers}</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vmess">VMess (<span id="count-vmess">{len(servers_by_protocol.get("vmess", []))}</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="vless">VLess (<span id="count-vless">{len(servers_by_protocol.get("vless", []))}</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="trojan">Trojan (<span id="count-trojan">{len(servers_by_protocol.get("trojan", []))}</span>)</button>
-            <button class="tab-btn px-6 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium" data-filter="ss">Shadowsocks (<span id="count-ss">{len(servers_by_protocol.get("ss", []))}</span>)</button>
-        </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-4 py-8">
-        <h2 class="text-2xl font-bold mb-6 text-gray-900">اختر السيرفر المناسب لك</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="servers-grid"></div>
-        <div id="no-servers-msg" class="text-center py-12 text-gray-400 hidden">لا توجد سيرفرات متاحة.</div>
-    </section>
-
-    <footer class="bg-gray-900 text-white py-12 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-400 text-sm">© 2026 DOKA. جميع الحقوق محفوظة.</p>
-            <button id="show-stats-btn" class="mt-4 text-blue-400 text-sm underline">عرض الإحصائيات</button>
-        </div>
-    </footer>
-
-    <div id="stats-page" class="max-w-7xl mx-auto px-4 py-12 hidden">
-        <h2 class="text-3xl font-bold text-center mb-8">📊 إحصائيات السيرفرات</h2>
-        <div id="chart-container"><canvas id="stats-chart"></canvas></div>
-        <p class="text-center text-gray-500 mt-4">آخر تحديث: <span id="stats-last-update"></span></p>
-        <button id="back-to-servers" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl mx-auto block">عودة للسيرفرات</button>
+    <!-- خلفية متحركة -->
+    <div class="bg-animated">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-all pointer-events-none z-50">✅ تم النسخ!</div>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-brand">⬡ DOKA EXCLAVE</div>
+            <div class="navbar-stats">
+                <div class="pulse-dot"></div>
+                <span id="status-text">Exclave VPN Cloud</span>
+                <span style="color:var(--text-secondary)">•</span>
+                <span>{now}</span>
+            </div>
+            <div class="navbar-actions">
+                <button class="btn-icon" id="dark-toggle" aria-label="تبديل الوضع الليلي" title="الوضع الليلي">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <i class="fas fa-shield-check"></i>
+            <span>حصرياً من Exclave VPN • آخر تحديث: {now}</span>
+        </div>
+        <h1 class="hero-title">
+            <span class="gradient-text">حرية</span> التصفح<br>مع Exclave
+        </h1>
+        <p class="hero-subtitle" id="hero-subtitle">
+            سيرفرات Exclave VPN الحصرية • مشفرة • سريعة • محدثة تلقائياً كل 3 ساعات
+        </p>
+        <div class="counter-card">
+            <div class="counter-number">{total_servers}</div>
+            <div class="counter-label" id="counter-label">🔰 سيرفر Exclave نشط وجاهز</div>
+        </div>
+    </section>
+
+    <!-- فلترة -->
+    <section class="filter-section">
+        <div class="filter-tabs" id="filter-tabs">
+            <button class="tab-btn active" data-filter="all">
+                <i class="fas fa-globe"></i> الكل
+                <span class="tab-count">{total_servers}</span>
+            </button>
+            <button class="tab-btn" data-filter="vmess">
+                <span class="tab-dot" style="background:#8b5cf6"></span> VMess
+                <span class="tab-count">{counts['vmess']}</span>
+            </button>
+            <button class="tab-btn" data-filter="vless">
+                <span class="tab-dot" style="background:#06b6d4"></span> VLess
+                <span class="tab-count">{counts['vless']}</span>
+            </button>
+            <button class="tab-btn" data-filter="trojan">
+                <span class="tab-dot" style="background:#f59e0b"></span> Trojan
+                <span class="tab-count">{counts['trojan']}</span>
+            </button>
+            <button class="tab-btn" data-filter="ss">
+                <span class="tab-dot" style="background:#10b981"></span> SS
+                <span class="tab-count">{counts['ss']}</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- السيرفرات -->
+    <section class="servers-section">
+        <div class="servers-grid" id="servers-grid"></div>
+        <div id="no-servers" style="display:none; text-align:center; padding:60px; color:var(--text-secondary); font-size:1.2rem;">
+            <i class="fas fa-inbox" style="font-size:3rem; display:block; margin-bottom:16px; opacity:0.3;"></i>
+            <span id="no-servers-text">لا توجد سيرفرات Exclave متاحة حالياً</span>
+        </div>
+    </section>
+
+    <!-- الإحصائيات -->
+    <section class="stats-page" id="stats-page" style="display:none;">
+        <div class="stats-card">
+            <h2 style="font-size:2rem; margin-bottom:8px;">📊 إحصائيات Exclave</h2>
+            <p style="color:var(--text-secondary); margin-bottom:32px;">آخر تحديث: <span id="stats-last-update"></span></p>
+            <canvas id="stats-chart" style="max-height:400px;"></canvas>
+            <button onclick="location.reload()" style="
+                margin-top:32px;
+                padding:14px 40px;
+                border-radius:50px;
+                border:none;
+                background:var(--exclave-gradient);
+                color:white;
+                font-family:'Cairo',sans-serif;
+                font-weight:700;
+                font-size:1rem;
+                cursor:pointer;
+                transition:all 0.3s;
+            ">⬅️ العودة للسيرفرات</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="position:relative; z-index:1; text-align:center; padding:40px 24px; color:var(--text-secondary);">
+        <p style="margin-bottom:16px;">© 2026 <strong>DOKA PRO × Exclave</strong> • جميع الحقوق محفوظة</p>
+        <button id="show-stats-btn" style="
+            background:none; border:none; color:var(--primary); cursor:pointer;
+            font-family:'Cairo',sans-serif; font-weight:600; font-size:0.9rem;
+            text-decoration:underline;
+        ">📊 عرض الإحصائيات التفصيلية</button>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" style="color:#10b981;"></i>
+        <span>تم نسخ رابط Exclave بنجاح!</span>
+    </div>
 
     <script>
         const serversData = {servers_json};
+        const PROTOCOL_COLORS = {json.dumps(PROTOCOL_COLORS)};
+        const PROTOCOL_ICONS = {json.dumps(PROTOCOL_ICONS)};
         let currentFilter = 'all';
         let chartInstance = null;
-        
-        const darkToggle = document.getElementById('dark-mode-toggle');
+
+        // ============ الترجمة ============
+        const translations = {{
+            ar: {{
+                counterLabel: '🔰 سيرفر Exclave نشط وجاهز',
+                copy: '📋 نسخ الرابط',
+                active: 'نشط',
+                inactive: 'خامل',
+                noServers: 'لا توجد سيرفرات Exclave متاحة حالياً',
+                statusAll: 'Exclave VPN Cloud',
+                toast: 'تم نسخ رابط Exclave بنجاح!',
+                qrTitle: '📱 امسح الكود',
+            }},
+            en: {{
+                counterLabel: '🔰 Active Exclave Servers',
+                copy: '📋 Copy Link',
+                active: 'Active',
+                inactive: 'Inactive',
+                noServers: 'No Exclave servers available',
+                statusAll: 'Exclave VPN Cloud',
+                toast: 'Exclave link copied!',
+                qrTitle: '📱 Scan QR',
+            }}
+        }};
+        let currentLang = 'ar';
+
+        function t(key) {{
+            return translations[currentLang][key] || key;
+        }}
+
+        // ============ Dark Mode ============
+        const darkToggle = document.getElementById('dark-toggle');
         darkToggle.addEventListener('click', () => {{
-            document.getElementById('main-body').classList.toggle('dark');
-            darkToggle.innerHTML = document.getElementById('main-body').classList.contains('dark') ? 
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            document.body.classList.toggle('dark');
+            const icon = darkToggle.querySelector('i');
+            if (document.body.classList.contains('dark')) {{
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('doka-exclave-dark', 'true');
+            }} else {{
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('doka-exclave-dark', 'false');
+            }}
         }});
-        
-        function renderServers(filter) {{
+        if (localStorage.getItem('doka-exclave-dark') === 'true') {{
+            document.body.classList.add('dark');
+            darkToggle.querySelector('i').className = 'fas fa-sun';
+        }}
+
+        // ============ عرض البطاقات ============
+        function renderCards(filter) {{
             const grid = document.getElementById('servers-grid');
-            const filtered = filter === 'all' ? serversData : serversData.filter(s => s.proto.toLowerCase() === filter);
-            
+            const noMsg = document.getElementById('no-servers');
+            const noMsgText = document.getElementById('no-servers-text');
+
+            const filtered = filter === 'all'
+                ? serversData
+                : serversData.filter(s => s.proto.toLowerCase() === filter);
+
             if (filtered.length === 0) {{
                 grid.innerHTML = '';
-                document.getElementById('no-servers-msg').classList.remove('hidden');
+                noMsgText.innerText = t('noServers');
+                noMsg.style.display = 'block';
                 return;
             }}
-            document.getElementById('no-servers-msg').classList.add('hidden');
-            
+
+            noMsg.style.display = 'none';
+            const isActiveMap = new Map();
+
             let html = '';
             filtered.forEach((server, i) => {{
-                const shortLink = server.link.substring(0, 60) + (server.link.length > 60 ? '...' : '');
-                const isActive = Math.random() > 0.1;
-                const statusText = isActive ? 'نشط' : 'خامل';
-                const statusColor = isActive ? 'text-green-600' : 'text-red-500';
-                
+                if (!isActiveMap.has(server.link)) {{
+                    isActiveMap.set(server.link, Math.random() > 0.1);
+                }}
+                const isActive = isActiveMap.get(server.link);
+                const shortLink = server.link.length > 70
+                    ? server.link.substring(0, 68) + '...'
+                    : server.link;
+                const protoColor = PROTOCOL_COLORS[server.proto.toLowerCase()] || '#6366f1';
+                const protoIcon = PROTOCOL_ICONS[server.proto.toLowerCase()] || 'fa-cube';
+                const statusClass = isActive ? 'status-active' : 'status-inactive';
+                const statusText = isActive ? t('active') : t('inactive');
+                const statusColor = isActive ? 'var(--success)' : 'var(--danger)';
+
                 html += `
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-2xl">${{server.flag}}</span>
-                                <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">${{server.proto}}</span>
-                                <span class="${{statusColor}} text-xs"><i class="fas fa-circle text-[6px] align-middle"></i> ${{statusText}}</span>
-                                <span class="text-gray-400 text-xs"><i class="fas fa-tachometer-alt"></i> ${{server.ping}}ms</span>
-                            </div>
-                            <button onclick="copyText('${{server.link}}')" class="text-gray-400 hover:text-blue-600"><i class="far fa-copy"></i></button>
+                <div class="server-card">
+                    <div class="server-card-header">
+                        <div class="server-info">
+                            <span class="server-flag">${{server.flag}}</span>
+                            <span class="server-proto-badge" style="background:${{protoColor}}">
+                                <i class="fas ${{protoIcon}}"></i> ${{server.proto}}
+                            </span>
+                            <span class="server-status" style="color:${{statusColor}}">
+                                <span class="status-dot ${{statusClass}}"></span>
+                                ${{statusText}}
+                            </span>
                         </div>
-                        <p class="text-xs font-mono text-gray-500 bg-gray-50 p-3 rounded-xl mb-4 break-all border border-gray-100" dir="ltr">${{shortLink}}</p>
-                        <div class="flex gap-2">
-                            <button onclick="copyText('${{server.link}}')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700">نسخ</button>
-                            <button onclick="toggleQR('q${{i}}', '${{server.link}}')" class="px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"><i class="fas fa-qrcode"></i></button>
-                        </div>
-                        <div id="q${{i}}" class="hidden mt-4 p-4 bg-white rounded-2xl flex justify-center border-2 border-dashed border-blue-100"></div>
+                        <span style="font-size:0.8rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px;">
+                            <i class="fas fa-tachometer-alt"></i> ${{server.ping}}ms
+                        </span>
                     </div>
-                `;
+                    <div class="server-url-box">${{shortLink}}</div>
+                    <div class="server-actions">
+                        <button class="btn-copy" onclick="copyToClipboard('${{server.link.replace(/'/g, "\\'")}}')" style="background:${{protoColor}}">
+                            <i class="far fa-copy"></i> ${{t('copy')}}
+                        </button>
+                        <button class="btn-qr" onclick="toggleQR('qr${{i}}', '${{server.link.replace(/'/g, "\\'")}}')" title="${{t('qrTitle')}}">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </div>
+                    <div id="qr${{i}}" class="qr-container" style="display:none;"></div>
+                </div>`;
             }});
             grid.innerHTML = html;
         }}
-        
-        document.querySelectorAll('.tab-btn').forEach(btn => {{
-            btn.addEventListener('click', () => {{
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
-                btn.classList.add('active', 'bg-blue-600', 'text-white');
-                currentFilter = btn.dataset.filter;
-                renderServers(currentFilter);
+
+        // ============ نسخ النص ============
+        window.copyToClipboard = (text) => {{
+            navigator.clipboard.writeText(text).then(() => {{
+                showToast();
+            }}).catch(() => {{
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;opacity:0;';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast();
             }});
-        }});
-        
-        window.copyText = (text) => {{
-            navigator.clipboard.writeText(text);
-            const toast = document.getElementById('toast');
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2000);
         }};
-        
+
+        function showToast() {{
+            const toast = document.getElementById('toast');
+            toast.querySelector('span').innerText = t('toast');
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+        }}
+
+        // ============ QR Code ============
         window.toggleQR = (id, link) => {{
             const el = document.getElementById(id);
-            if (el.innerHTML === "") new QRCode(el, {{ text: link, width: 160, height: 160, colorDark: "#1e293b" }});
-            el.classList.toggle('hidden');
-        }};
-        
-        document.getElementById('show-stats-btn').addEventListener('click', async () => {{
-            document.querySelector('header').style.display = 'none';
-            document.querySelector('.hero-gradient').style.display = 'none';
-            document.getElementById('filter-tabs').style.display = 'none';
-            document.getElementById('servers-grid').style.display = 'none';
-            document.querySelector('h2').style.display = 'none';
-            document.getElementById('stats-page').classList.remove('hidden');
-            
-            const res = await fetch('stats.json');
-            const stats = await res.json();
-            document.getElementById('stats-last-update').textContent = new Date(stats.last_updated).toLocaleString();
-            
-            const ctx = document.getElementById('stats-chart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {{
-                type: 'bar',
-                data: {{
-                    labels: Object.keys(stats.by_protocol).map(p => p.toUpperCase()),
-                    datasets: [{{
-                        label: 'عدد السيرفرات',
-                        data: Object.values(stats.by_protocol),
-                        backgroundColor: '#2563eb'
-                    }}]
+            if (el.style.display === 'none') {{
+                if (!el.innerHTML) {{
+                    new QRCode(el, {{
+                        text: link,
+                        width: 180,
+                        height: 180,
+                        colorDark: '#1e293b',
+                        colorLight: '#ffffff',
+                    }});
                 }}
+                el.style.display = 'flex';
+                el.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+            }} else {{
+                el.style.display = 'none';
+            }}
+        }};
+
+        // ============ الفلترة ============
+        document.querySelectorAll('.tab-btn').forEach(btn => {{
+            btn.addEventListener('click', () => {{
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderCards(currentFilter);
             }});
         }});
-        
-        document.getElementById('back-to-servers').addEventListener('click', () => location.reload());
-        fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => document.getElementById('user-ip').textContent = d.ip);
-        renderServers('all');
+
+        // ============ الإحصائيات ============
+        document.getElementById('show-stats-btn').addEventListener('click', async () => {{
+            document.querySelector('.navbar').style.display = 'none';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.filter-section').style.display = 'none';
+            document.querySelector('.servers-section').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            document.getElementById('stats-page').style.display = 'block';
+
+            try {{
+                const res = await fetch('stats.json');
+                if (!res.ok) throw new Error();
+                const stats = await res.json();
+                document.getElementById('stats-last-update').innerText =
+                    new Date(stats.last_updated).toLocaleString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+
+                const ctx = document.getElementById('stats-chart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                const labels = Object.keys(stats.by_protocol).map(p => p.toUpperCase());
+                const data = Object.values(stats.by_protocol);
+                const colors = labels.map(l => PROTOCOL_COLORS[l.toLowerCase()] || '#6366f1');
+
+                chartInstance = new Chart(ctx, {{
+                    type: 'doughnut',
+                    data: {{
+                        labels: labels,
+                        datasets: [{{
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: document.body.classList.contains('dark') ? '#1a2332' : '#ffffff',
+                            borderWidth: 4,
+                            hoverBorderWidth: 6,
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {{
+                            legend: {{
+                                position: 'bottom',
+                                labels: {{
+                                    padding: 20,
+                                    font: {{ family: 'Cairo', size: 14 }},
+                                    color: document.body.classList.contains('dark') ? '#e2e8f0' : '#1e293b',
+                                }}
+                            }}
+                        }},
+                    }}
+                }});
+            }} catch (err) {{
+                console.error(err);
+                document.getElementById('stats-last-update').innerText = '—';
+            }}
+        }});
+
+        // ============ تحميل أولي ============
+        renderCards('all');
+
+        console.log('%c⬡ DOKA EXCLAVE %cExclusive Edition %cReady',
+            'color:#6366f1;font-size:2rem;font-weight:900;',
+            'color:#a855f7;font-size:1rem;',
+            'color:#10b981;');
+        console.log('%cTotal: %c{total_servers} %cExclave servers loaded',
+            'color:#64748b;', 'color:#6366f1;font-weight:bold;', 'color:#64748b;');
     </script>
 </body>
-</html>'''
-        
-        with open("index.html", "w", encoding="utf-8") as f:
-            f.write(html)
-        print(f"✅ [DOKA EXCLAVE] تم بنجاح! عدد السيرفرات: {total_servers}")
-        print(f"   - VMess: {len(servers_by_protocol.get('vmess', []))}")
-        print(f"   - VLess: {len(servers_by_protocol.get('vless', []))}")
-        print(f"   - Trojan: {len(servers_by_protocol.get('trojan', []))}")
-        print(f"   - Shadowsocks: {len(servers_by_protocol.get('ss', []))}")
-            
-    except Exception as e:
-        print(f"❌ Error: {e}")
+</html>"""
+
+
+# ==================== الدالة الرئيسية ====================
+def run_doka_exclave() -> None:
+    """الدالة الرئيسية لتشغيل سكريبت DOKA Exclave."""
+    html_content = fetch_telegram_page(TELEGRAM_CHANNEL_URL)
+    if not html_content:
+        print("⚠️ تعذّر جلب الصفحة. تأكد من اتصالك بالإنترنت.")
+        return
+
+    clean_links = extract_exclave_links(html_content)
+    print(f"✅ تم العثور على {len(clean_links)} رابط Exclave.")
+
+    if not clean_links:
+        print("⚠️ لم يتم العثور على أي روابط Exclave. قد تكون القناة فارغة حالياً.")
+        return
+
+    classified = classify_servers(clean_links)
+    html_output = generate_html(classified, list({
+        s["link"]: s for inner in classified.values() for s in inner
+    }.values()))
+
+    OUTPUT_FILE.write_text(html_output, encoding="utf-8")
+    total_servers = sum(len(server_list) for server_list in classified.values())
+
+    print(f"🎉 [DOKA EXCLAVE] تم بنجاح! عدد السيرفرات: {total_servers}")
+    print(f"   • VMess:     {len(classified.get('vmess', []))}")
+    print(f"   • VLess:     {len(classified.get('vless', []))}")
+    print(f"   • Trojan:   {len(classified.get('trojan', []))}")
+    print(f"   • SS:        {len(classified.get('ss', []))}")
+    if classified.get("other"):
+        print(f"   • Other:     {len(classified['other'])}")
+
 
 if __name__ == "__main__":
     run_doka_exclave()
