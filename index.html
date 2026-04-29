@@ -2,8 +2,19 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOKA PRO • Exclave VPN Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DOKA PRO">
+    <meta name="description" content="حرية التصفح بلا حدود - سيرفرات V2Ray و Exclave محدثة تلقائياً">
+    <title>DOKA PRO • V2Ray Freedom Cloud</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1'/%3E%3Cstop offset='50%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='100' fill='url(%23bg)'/%3E%3Ctext x='256' y='310' text-anchor='middle' font-size='180' fill='white' opacity='0.9'%3E🌐%3C/text%3E%3Ctext x='256' y='400' text-anchor='middle' font-size='50' font-weight='bold' fill='white'%3EDOKA%3C/text%3E%3C/svg%3E">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,10 +43,9 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --info: #3b82f6;
             --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --exclave-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #3730a3 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+            --gradient-exclave: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
@@ -68,6 +78,8 @@
             color: var(--text);
             min-height: 100vh;
             transition: background var(--transition), color var(--transition);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* ========== خلفية متحركة ========== */
@@ -138,7 +150,7 @@
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: 900;
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -182,7 +194,6 @@
             justify-content: center;
             font-size: 1.1rem;
             transition: all var(--transition);
-            position: relative;
         }
         .btn-icon:hover {
             background: var(--surface-hover);
@@ -213,9 +224,6 @@
             margin-bottom: 24px;
             box-shadow: var(--shadow-sm);
         }
-        .hero-badge i {
-            color: var(--primary);
-        }
         .hero-title {
             font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 900;
@@ -224,7 +232,7 @@
             letter-spacing: -1px;
         }
         .hero-title .gradient-text {
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -236,7 +244,13 @@
             line-height: 1.6;
         }
 
-        /* ========== Counter Glow Card ========== */
+        /* ========== Counter Cards ========== */
+        .counters-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
         .counter-card {
             position: relative;
             display: inline-flex;
@@ -245,37 +259,28 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 32px 64px;
+            padding: 28px 48px;
             box-shadow: var(--shadow-xl);
             transition: all var(--transition);
+            min-width: 160px;
         }
-        .counter-card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            background: var(--exclave-gradient);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity var(--transition);
-        }
-        .counter-card:hover::before {
-            opacity: 0.3;
+        .counter-card:hover {
+            transform: translateY(-4px);
         }
         .counter-number {
-            font-size: 5rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1;
         }
         .counter-label {
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             font-weight: 600;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
         /* ========== Filter Tabs ========== */
@@ -311,16 +316,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap;
         }
         .tab-btn:hover {
             background: var(--bg);
             color: var(--text);
         }
         .tab-btn.active {
-            background: var(--exclave-gradient);
+            background: var(--gradient-1);
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
         .tab-count {
             font-size: 0.75rem;
@@ -328,13 +332,9 @@
             padding: 2px 8px;
             border-radius: 50px;
         }
-        .tab-btn.active .tab-count {
-            background: rgba(255,255,255,0.3);
-        }
         .tab-dot {
             width: 8px; height: 8px;
             border-radius: 50%;
-            flex-shrink: 0;
         }
 
         /* ========== Servers Grid ========== */
@@ -350,8 +350,6 @@
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 20px;
         }
-
-        /* ========== Server Card ========== */
         .server-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -361,24 +359,11 @@
             position: relative;
             overflow: hidden;
         }
-        .server-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--exclave-gradient);
-            opacity: 0;
-            transition: opacity var(--transition);
-        }
         .server-card:hover {
             box-shadow: var(--shadow-xl);
             transform: translateY(-4px);
             border-color: var(--primary);
         }
-        .server-card:hover::before {
-            opacity: 1;
-        }
-
         .server-card-header {
             display: flex;
             justify-content: space-between;
@@ -391,17 +376,13 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-        .server-flag {
-            font-size: 2rem;
-            line-height: 1;
-        }
+        .server-flag { font-size: 2rem; line-height: 1; }
         .server-proto-badge {
             padding: 4px 12px;
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 700;
             color: white;
-            letter-spacing: 0.5px;
         }
         .server-status {
             display: flex;
@@ -414,16 +395,15 @@
             width: 6px; height: 6px;
             border-radius: 50%;
         }
-        .status-active { background: var(--success); }
-        .status-inactive { background: var(--danger); }
-
+        .status-alive { background: var(--success); }
+        .status-dead { background: var(--danger); }
         .server-url-box {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 14px 16px;
             margin-bottom: 16px;
-            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-family: monospace;
             font-size: 0.78rem;
             color: var(--text-secondary);
             direction: ltr;
@@ -431,12 +411,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            transition: all var(--transition);
         }
-        .server-card:hover .server-url-box {
-            border-color: var(--primary);
-        }
-
         .server-actions {
             display: flex;
             gap: 8px;
@@ -461,9 +436,6 @@
             box-shadow: 0 4px 20px var(--primary-glow);
             transform: translateY(-1px);
         }
-        .btn-copy:active {
-            transform: scale(0.97);
-        }
         .btn-qr {
             width: 48px; height: 48px;
             border-radius: var(--radius-sm);
@@ -482,22 +454,17 @@
             border-color: var(--primary);
             color: var(--primary);
         }
-
         .qr-container {
             margin-top: 16px;
             padding: 20px;
             background: white;
             border-radius: var(--radius-sm);
-            display: flex;
+            display: none;
             justify-content: center;
             border: 2px dashed var(--border);
-            transition: all var(--transition);
-        }
-        .dark .qr-container {
-            background: white;
         }
 
-        /* ========== Toast ========== */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 32px;
@@ -508,7 +475,6 @@
             padding: 14px 28px;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 0.9rem;
             z-index: 1000;
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -522,7 +488,7 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ========== Stats Page ========== */
+        /* Stats Page */
         .stats-page {
             position: relative;
             z-index: 1;
@@ -539,58 +505,34 @@
             box-shadow: var(--shadow-xl);
         }
 
-        /* ========== Responsive ========== */
         @media (max-width: 768px) {
-            .navbar-inner {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 12px;
-                padding: 12px 16px;
-            }
-            .hero-title {
-                font-size: 2rem;
-            }
-            .counter-number {
-                font-size: 3rem;
-            }
-            .counter-card {
-                padding: 24px 40px;
-            }
-            .servers-grid {
-                grid-template-columns: 1fr;
-            }
-            .filter-tabs {
-                gap: 4px;
-                padding: 6px;
-            }
-            .tab-btn {
-                padding: 10px 16px;
-                font-size: 0.8rem;
-            }
+            .navbar-inner { flex-wrap:wrap; justify-content:center; gap:12px; padding:12px 16px; }
+            .hero-title { font-size:2rem; }
+            .counter-number { font-size:2.5rem; }
+            .counter-card { padding:20px 32px; min-width:120px; }
+            .servers-grid { grid-template-columns:1fr; }
+            .tab-btn { padding:10px 16px; font-size:0.8rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- خلفية متحركة -->
     <div class="bg-animated">
-        <div class="orb"></div>
-        <div class="orb"></div>
-        <div class="orb"></div>
+        <div class="orb"></div><div class="orb"></div><div class="orb"></div>
     </div>
 
     <!-- شريط التنقل -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <div class="navbar-brand">⬡ DOKA EXCLAVE</div>
+            <div class="navbar-brand">✦ DOKA PRO</div>
             <div class="navbar-stats">
                 <div class="pulse-dot"></div>
-                <span id="status-text">Exclave VPN Cloud</span>
+                <span>🟢 9/32 مباشر</span>
                 <span style="color:var(--text-secondary)">•</span>
-                <span>2026-04-29 17:43</span>
+                <span>2026-04-29 18:09</span>
             </div>
             <div class="navbar-actions">
-                <button class="btn-icon" id="dark-toggle" aria-label="تبديل الوضع الليلي" title="الوضع الليلي">
+                <button class="btn-icon" id="dark-toggle" title="الوضع الليلي">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
@@ -601,333 +543,164 @@
     <section class="hero">
         <div class="hero-badge">
             <i class="fas fa-shield-check"></i>
-            <span>حصرياً من Exclave VPN • آخر تحديث: 2026-04-29 17:43</span>
+            <span>v2nodes + Exclave • تحديث تلقائي كل 3 ساعات</span>
         </div>
         <h1 class="hero-title">
-            <span class="gradient-text">حرية</span> التصفح<br>مع Exclave
+            <span class="gradient-text">حرية</span> التصفح<br>بلا حدود
         </h1>
-        <p class="hero-subtitle" id="hero-subtitle">
-            سيرفرات Exclave VPN الحصرية • مشفرة • سريعة • محدثة تلقائياً كل 3 ساعات
-        </p>
-        <div class="counter-card">
-            <div class="counter-number">12</div>
-            <div class="counter-label" id="counter-label">🔰 سيرفر Exclave نشط وجاهز</div>
+        <p class="hero-subtitle">سيرفرات V2Ray و Exclave VPN محدثة تلقائياً • اختر بروتوكولك المفضل وانطلق</p>
+        <div class="counters-row">
+            <div class="counter-card">
+                <div class="counter-number">32</div>
+                <div class="counter-label">🔰 إجمالي السيرفرات</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number" style="background:var(--gradient-2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">20</div>
+                <div class="counter-label">📡 V2Ray عام</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number" style="background:var(--gradient-exclave); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">12</div>
+                <div class="counter-label">⬡ Exclave حصري</div>
+            </div>
         </div>
     </section>
 
     <!-- فلترة -->
     <section class="filter-section">
-        <div class="filter-tabs" id="filter-tabs">
-            <button class="tab-btn active" data-filter="all">
-                <i class="fas fa-globe"></i> الكل
-                <span class="tab-count">12</span>
-            </button>
-            <button class="tab-btn" data-filter="vmess">
-                <span class="tab-dot" style="background:#8b5cf6"></span> VMess
-                <span class="tab-count">0</span>
-            </button>
-            <button class="tab-btn" data-filter="vless">
-                <span class="tab-dot" style="background:#06b6d4"></span> VLess
-                <span class="tab-count">1</span>
-            </button>
-            <button class="tab-btn" data-filter="trojan">
-                <span class="tab-dot" style="background:#f59e0b"></span> Trojan
-                <span class="tab-count">3</span>
-            </button>
-            <button class="tab-btn" data-filter="ss">
-                <span class="tab-dot" style="background:#10b981"></span> SS
-                <span class="tab-count">0</span>
-            </button>
+        <div class="filter-tabs">
+            <button class="tab-btn active" data-filter="all"><i class="fas fa-globe"></i> الكل <span class="tab-count">32</span></button>
+            <button class="tab-btn" data-filter="vmess"><span class="tab-dot" style="background:#8b5cf6"></span> VMess <span class="tab-count">5</span></button>
+            <button class="tab-btn" data-filter="vless"><span class="tab-dot" style="background:#06b6d4"></span> VLess <span class="tab-count">9</span></button>
+            <button class="tab-btn" data-filter="trojan"><span class="tab-dot" style="background:#f59e0b"></span> Trojan <span class="tab-count">5</span></button>
+            <button class="tab-btn" data-filter="ss"><span class="tab-dot" style="background:#10b981"></span> SS <span class="tab-count">5</span></button>
+            <button class="tab-btn" data-filter="v2nodes">📡 v2nodes <span class="tab-count">20</span></button>
+            <button class="tab-btn" data-filter="exclave">⬡ Exclave <span class="tab-count">12</span></button>
         </div>
     </section>
 
     <!-- السيرفرات -->
     <section class="servers-section">
         <div class="servers-grid" id="servers-grid"></div>
-        <div id="no-servers" style="display:none; text-align:center; padding:60px; color:var(--text-secondary); font-size:1.2rem;">
+        <div id="no-servers" style="display:none; text-align:center; padding:60px; color:var(--text-secondary);">
             <i class="fas fa-inbox" style="font-size:3rem; display:block; margin-bottom:16px; opacity:0.3;"></i>
-            <span id="no-servers-text">لا توجد سيرفرات Exclave متاحة حالياً</span>
-        </div>
-    </section>
-
-    <!-- الإحصائيات -->
-    <section class="stats-page" id="stats-page" style="display:none;">
-        <div class="stats-card">
-            <h2 style="font-size:2rem; margin-bottom:8px;">📊 إحصائيات Exclave</h2>
-            <p style="color:var(--text-secondary); margin-bottom:32px;">آخر تحديث: <span id="stats-last-update"></span></p>
-            <canvas id="stats-chart" style="max-height:400px;"></canvas>
-            <button onclick="location.reload()" style="
-                margin-top:32px;
-                padding:14px 40px;
-                border-radius:50px;
-                border:none;
-                background:var(--exclave-gradient);
-                color:white;
-                font-family:'Cairo',sans-serif;
-                font-weight:700;
-                font-size:1rem;
-                cursor:pointer;
-                transition:all 0.3s;
-            ">⬅️ العودة للسيرفرات</button>
+            لا توجد سيرفرات متاحة
         </div>
     </section>
 
     <!-- Footer -->
     <footer style="position:relative; z-index:1; text-align:center; padding:40px 24px; color:var(--text-secondary);">
-        <p style="margin-bottom:16px;">© 2026 <strong>DOKA PRO × Exclave</strong> • جميع الحقوق محفوظة</p>
-        <button id="show-stats-btn" style="
-            background:none; border:none; color:var(--primary); cursor:pointer;
-            font-family:'Cairo',sans-serif; font-weight:600; font-size:0.9rem;
-            text-decoration:underline;
-        ">📊 عرض الإحصائيات التفصيلية</button>
+        <p>© 2026 <strong>DOKA PRO</strong> • جميع الحقوق محفوظة</p>
+        <button id="show-stats-btn" style="background:none; border:none; color:var(--primary); cursor:pointer; font-family:'Cairo',sans-serif; font-weight:600; text-decoration:underline;">📊 الإحصائيات</button>
     </footer>
 
+    <!-- الإحصائيات -->
+    <section class="stats-page" id="stats-page" style="display:none;">
+        <div class="stats-card">
+            <h2 style="font-size:2rem; margin-bottom:8px;">📊 لوحة الإحصائيات</h2>
+            <p style="color:var(--text-secondary); margin-bottom:32px;">آخر تحديث: <span id="stats-last-update"></span></p>
+            <canvas id="stats-chart" style="max-height:400px;"></canvas>
+            <button onclick="location.reload()" style="margin-top:32px; padding:14px 40px; border-radius:50px; border:none; background:var(--gradient-1); color:white; font-family:'Cairo',sans-serif; font-weight:700; cursor:pointer;">⬅️ عودة</button>
+        </div>
+    </section>
+
     <!-- Toast -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle" style="color:#10b981;"></i>
-        <span>تم نسخ رابط Exclave بنجاح!</span>
-    </div>
+    <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10b981;"></i> <span>تم النسخ!</span></div>
 
     <script>
-        const serversData = [{"link": "exclave://vless?eNpTYWBgMDQz0DM00zM30jO02DhRnoFhqZGZqZFJcnKqboqpoYmuiQGQSDQxMtM1NjNNSzIyM0s0NEnJy897Wv65Mq-8JNFSL7EgUzc1JT1VLy09rVyvsKpKL_O9fkpiXlpq3nMGEAhOTdYNT00Kzk_OTi3RDSjKL8lPzn9TkoPPgEYQYACTIMsYOIDmgBkZRrmlPxhQQCMTkJj0dsGet9vXg8mtRuYOqRXJOYllqWUFeSAlAF7eT0I", "proto": "VLESS", "flag": "🌍", "ping": 70}, {"link": "exclave://trojan?eNpjYmBgUAFiQ0sTPQtzPXNzPcuNuxkZGBobyz9np-XqJuUZ6BUkpqcW66Wkftupb59RUlJQrGrsqGrkBkQlermpQCo8MS_dOTHTSNXNQNXSTdXCXNXRAsF2MrZl4AJaEZyarBuemhScn5ydWqIbUJRfkp-c_6YkB9OeRhBgBBF5-XlPGTiAmsGMDKPc0h8MKKDR0MjYxNTM3MJyAxOQO-ntgj1vt-8Ak6uMzB1SK5JzEstSywryQIoBlPpKYw", "proto": "TROJAN", "flag": "🌍", "ping": 120}, {"link": "exclave://trojan?eNpjYmBgUAFiQwsLPUNjAz0jYyBtusNZlIGhsbEk-UNeft5TICPnc3aVrqFeUmpFaa5eWum7RhBgABEgBQwcQBPAjAyj3NIfDCig0Sk3LMkyxD2_siQyI9EnLyojuyjMuaTCIjsjKdAtxPE-E1DRpLcL9rzdvgFM7jeydEitSM5JLEstK8gDGQEAuFg4CQ", "proto": "TROJAN", "flag": "🌍", "ping": 101}, {"link": "exclave://trojan?eNpjYmBgUAFiEzM9Cz1DQ2M9Q5NNuxkZGBobS5I_5OXnPQUycj4nZ-ga6SWlVpTm6qWVvmsEAQYQAVLAwAHUDmZkGOWW_mBAAY1OuWFJliHu-ZUlkRmJPnlRGdlFYc4lFRbZGUmBbiGO95mAiqa8XbDn7fYVYHK_goKRpUNqRXJOYllqWUEeyBAA6sY37A", "proto": "TROJAN", "flag": "🌍", "ping": 157}, {"link": "exclave://hysteria2?eNpjZ2BgMDHTMzIx1jMyNNQz3G7BwsCw1NzU2NTM0tBS1yw1OVXXxNQ0WTcp0TxR1zLNwMQo0cwgxSjZtDE3sSg7tUSvMjEvJbVCr-hrIxAwMqABCwOTjTA2UB5dmiEp6VNxCdCExKInTEDulLcL9rzdvh1M7lJQMLJwSK1IzkksSy0ryAMpBwAtGy3w", "proto": "UNKNOWN", "flag": "🌍", "ping": 122}, {"link": "exclave://hysteria2?eNpjZ2BgMDQx0TM21DMyMtEzNNtswcLAsKKouCQvL8fKPKckyim3JNEkMcMnNS_EM7-y3KnSOMgwyjAgzDzKPc25rCIiKi-4JMMwKczL290twCg5P82kyNPUKDPNw8voel5RamJOZnFJZrJeXp5uWn5Jvl7R10YgYGRAAxaWxptgbKA8ujRDUtKn4pLEvJTEoidMQO6Utwv2vN2-GUxuVFAwsnBIrUjOSSxLLSvIAykHAP_fPwM", "proto": "UNKNOWN", "flag": "🌍", "ping": 103}, {"link": "exclave://hysteria2?eNpjZ2BgMDQ00zMyMNOzNNIzNNpswcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE83q0DXwNBALy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A75e2CPW-3rweTWxUUjCwcUiuScxLLUoGWgJQDAPzhL6w", "proto": "UNKNOWN", "flag": "🌍", "ping": 203}, {"link": "exclave://hysteria2?eNpjZ2BgsDDWMzIx1rMw0zM02GzBwsCwND2zJKM0SS85P1ffMacsM88SCHTzUssLEpP10xLzCjMT89Iby8vL9XIzk4vyi_PTSoBq3zYCASMDGjA0sjDdCuMAFaDLMyQlfSouScxLSSx6wgTkTnm7YM_b7SvB5CoFBSMLh9SK5JzEstSygjyQcgC0NTJp", "proto": "UNKNOWN", "flag": "🌍", "ping": 170}, {"link": "exclave://hysteria2?eNpjZ2BgMDQz1jM0N9IzNATShjssWBgYUvLz0ksSM8sT89L1kvPfNpaXl-vlZiYX5Rfnp5WARYCAkQENmBgYGG2CcYAK0OUZkpI-FZck5qUkFj1hAnKnvF2w5-321WByu4KCkYVDakVyTmJZallBHkg5AGjGK4c", "proto": "UNKNOWN", "flag": "🌍", "ping": 126}, {"link": "exclave://hysteria2?eNpjZ2BgMDQ00zMyMNOzNNIzMt5iwcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE83q0DXwNBQLy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A76e2CPW-3rweTW40sHVIrknMSy1KBVoAUAwClSS9v", "proto": "UNKNOWN", "flag": "🌍", "ping": 193}, {"link": "exclave://hysteria2?eNpjZ2BgMLQw0LM01jM0M9EzMt1kwcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE-3LE_XwMBQLy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A75e2CPW-37waTmxUUjCwdUiuScxLLUoGWgJQDAAfkL8k", "proto": "UNKNOWN", "flag": "🌍", "ping": 123}, {"link": "exclave://hysteria2?eNpjZ2BgMDQx1DM0MNUzM9MztNhpwcLAsNTc1NjUzNLQUtcsNTlV18TUNFk3KdE8UdcyzcDEKNHMIMUo2bQxJ7MsVS8_W6_oayMQMDKgAROTzTAmUBpdliEp6VNxSWJeSmLREyYgd8rbBXvebt8OJncpKBhZOqRWJOcklqWWFeSBlAMAwHArdw", "proto": "UNKNOWN", "flag": "🌍", "ping": 126}];
+        const serversData = [{"url": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@194.76.173.6:2053?allowInsecure=1&encryption=none&host=sni.111000.indevs.in&path=%2F%3FTelegram%F0%9F%87%A8%F0%9F%87%B3%40WangCai2%3D&security=tls&sni=sni.111000.indevs.in&type=ws#", "proto": "VLESS", "country": "🇮🇳", "ping": 91, "alive": true, "source": "v2nodes"}, {"url": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@188.241.241.123:2053?allowInsecure=1&ed=2560&eh=Sec-WebSocket-Protocol&encryption=none&host=sni.111000.indevs.in&path=%2F%3FTelegram%25F0%259F%2587%25A8%25F0%259F%2587%25B3%2540WangCai2%3D&security=tls&sni=sni.111000.indevs.in&type=ws#", "proto": "VLESS", "country": "🇮🇳", "ping": 91, "alive": true, "source": "v2nodes"}, {"url": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@188.241.241.29:2053?ed=2560&eh=Sec-WebSocket-Protocol&encryption=none&host=sni.111000.v6.navy&path=%2F%3FTelegram%25F0%259F%2587%25A8%25F0%259F%2587%25B3%2B%2540WangCai2%3D&security=tls&sni=sni.111000.v6.navy&type=ws#", "proto": "VLESS", "country": "🌍", "ping": 91, "alive": true, "source": "v2nodes"}, {"url": "exclave://trojan?eNpjYmBgUAFiQ0sTPQtzPXNzPcuNuxkZGBobyz9np-XqJuUZ6BUkpqcW66Wkftupb59RUlJQrGrsqGrkBkQlermpQCo8MS_dOTHTSNXNQNXSTdXCXNXRAsF2MrZl4AJaEZyarBuemhScn5ydWqIbUJRfkp-c_6YkB9OeRhBgBBF5-XlPGTiAmsGMDKPc0h8MKKDR0MjYxNTM3MJyAxOQO-ntgj1vt-8Ak6uMzB1SK5JzEstSywryQIoBlPpKYw", "proto": "TROJAN", "country": "🌍", "ping": 295, "alive": false, "source": "exclave"}, {"url": "exclave://vless?eNpTYWBgMDQz0DM00zM30jO02DhRnoFhqZGZqZFJcnKqboqpoYmuiQGQSDQxMtM1NjNNSzIyM0s0NEnJy897Wv65Mq-8JNFSL7EgUzc1JT1VLy09rVyvsKpKL_O9fkpiXlpq3nMGEAhOTdYNT00Kzk_OTi3RDSjKL8lPzn9TkoPPgEYQYACTIMsYOIDmgBkZRrmlPxhQQCMTkJj0dsGet9vXg8mtRuYOqRXJOYllqWUFeSAlAF7eT0I", "proto": "VLESS", "country": "🌍", "ping": 321, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDHTMzIx1jMyNNQz3G7BwsCw1NzU2NTM0tBS1yw1OVXXxNQ0WTcp0TxR1zLNwMQo0cwgxSjZtDE3sSg7tUSvMjEvJbVCr-hrIxAwMqABCwOTjTA2UB5dmiEp6VNxCdCExKInTEDulLcL9rzdvh1M7lJQMLJwSK1IzkksSy0ryAMpBwAtGy3w", "proto": "UNKNOWN", "country": "🌍", "ping": 369, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDQx0TM21DMyMtEzNNtswcLAsKKouCQvL8fKPKckyim3JNEkMcMnNS_EM7-y3KnSOMgwyjAgzDzKPc25rCIiKi-4JMMwKczL290twCg5P82kyNPUKDPNw8voel5RamJOZnFJZrJeXp5uWn5Jvl7R10YgYGRAAxaWxptgbKA8ujRDUtKn4pLEvJTEoidMQO6Utwv2vN2-GUxuVFAwsnBIrUjOSSxLLSvIAykHAP_fPwM", "proto": "UNKNOWN", "country": "🌍", "ping": 349, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDQ00zMyMNOzNNIzNNpswcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE83q0DXwNBALy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A75e2CPW-3rweTWxUUjCwcUiuScxLLUoGWgJQDAPzhL6w", "proto": "UNKNOWN", "country": "🌍", "ping": 224, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgsDDWMzIx1rMw0zM02GzBwsCwND2zJKM0SS85P1ffMacsM88SCHTzUssLEpP10xLzCjMT89Iby8vL9XIzk4vyi_PTSoBq3zYCASMDGjA0sjDdCuMAFaDLMyQlfSouScxLSSx6wgTkTnm7YM_b7SvB5CoFBSMLh9SK5JzEstSygjyQcgC0NTJp", "proto": "UNKNOWN", "country": "🌍", "ping": 376, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDQz1jM0N9IzNATShjssWBgYUvLz0ksSM8sT89L1kvPfNpaXl-vlZiYX5Rfnp5WARYCAkQENmBgYGG2CcYAK0OUZkpI-FZck5qUkFj1hAnKnvF2w5-321WByu4KCkYVDakVyTmJZallBHkg5AGjGK4c", "proto": "UNKNOWN", "country": "🌍", "ping": 207, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDQ00zMyMNOzNNIzMt5iwcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE83q0DXwNBQLy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A76e2CPW-3rweTW40sHVIrknMSy1KBVoAUAwClSS9v", "proto": "UNKNOWN", "country": "🌍", "ping": 375, "alive": false, "source": "exclave"}, {"url": "exclave://trojan?eNpjYmBgUAFiQwsLPUNjAz0jYyBtusNZlIGhsbEk-UNeft5TICPnc3aVrqFeUmpFaa5eWum7RhBgABEgBQwcQBPAjAyj3NIfDCig0Sk3LMkyxD2_siQyI9EnLyojuyjMuaTCIjsjKdAtxPE-E1DRpLcL9rzdvgFM7jeydEitSM5JLEstK8gDGQEAuFg4CQ", "proto": "TROJAN", "country": "🌍", "ping": 297, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMLQw0LM01jM0M9EzMt1kwcLAUBiYalhlmh1qke1nFpzjnedSYhlUahz4obGsIE-3LE_XwMBQLy2xuCS1CCigV55flPOkEQgYGdCAiclmGBMojS7LkJT0qbgkMS8lsegJE5A75e2CPW-37waTmxUUjCwdUiuScxLLUoGWgJQDAAfkL8k", "proto": "UNKNOWN", "country": "🌍", "ping": 286, "alive": false, "source": "exclave"}, {"url": "exclave://hysteria2?eNpjZ2BgMDQx1DM0MNUzM9MztNhpwcLAsNTc1NjUzNLQUtcsNTlV18TUNFk3KdE8UdcyzcDEKNHMIMUo2bQxJ7MsVS8_W6_oayMQMDKgAROTzTAmUBpdliEp6VNxSWJeSmLREyYgd8rbBXvebt8OJncpKBhZOqRWJOcklqWWFeSBlAMAwHArdw", "proto": "UNKNOWN", "country": "🌍", "ping": 383, "alive": false, "source": "exclave"}, {"url": "exclave://trojan?eNpjYmBgUAFiEzM9Cz1DQ2M9Q5NNuxkZGBobS5I_5OXnPQUycj4nZ-ga6SWlVpTm6qWVvmsEAQYQAVLAwAHUDmZkGOWW_mBAAY1OuWFJliHu-ZUlkRmJPnlRGdlFYc4lFRbZGUmBbiGO95mAiqa8XbDn7fYVYHK_goKRpUNqRXJOYllqWUEeyBAA6sY37A", "proto": "TROJAN", "country": "🌍", "ping": 246, "alive": false, "source": "exclave"}, {"url": "vmess://eyJhZGQiOiIzNS4yMTIuMTc3LjY3IiwiYWlkIjoiMCIsImFscG4iOiIiLCJmcCI6IiIsImhvc3QiOiIiLCJpZCI6ImU4YWIzN2M3LTJiMWQtNDc3Ni1jMDYyLTJjYWM4ZmMwNjZlMSIsIm5ldCI6InRjcCIsInBhdGgiOiIiLCJwb3J0IjoiNDAwMjkiLCJwcyI6Ilx1ZDgzY1x1ZGRmYVx1ZDgzY1x1ZGRmOFtvcGVucHJveHlsaXN0LmNvbV0gdm1lc3MtVVMiLCJzY3kiOiJhdXRvIiwic25pIjoiIiwidGxzIjoiIiwidHlwZSI6Im5vbmUiLCJ2IjoiMiIsInNraXAtY2VydC12ZXJpZnkiOnRydWV9", "proto": "VMESS", "country": "🌍", "ping": 206, "alive": false, "source": "v2nodes"}, {"url": "vless://ce069292-c8bf-40dd-a6b1-87818a1e64e9@193.108.112.212:443?sni=1-aym.pages.dev&type=ws&host=1-aym.pages.dev&path=/proxyip=ProxyIP.DE.owg.dpdns.orgfp=chrome&security=tls#", "proto": "VLESS", "country": "🇩🇪", "ping": 151, "alive": true, "source": "v2nodes"}, {"url": "vmess://eyJ2IjoiMiIsInBzIjoiXHVkODNjXHVkZGZhXHVkODNjXHVkZGY4W29wZW5wcm94eWxpc3QuY29tXSB2bWVzcy1VUyIsImFkZCI6InNhbmpvc2UwMS56Z2pvay5jb20iLCJwb3J0Ijo0NDMsImFpZCI6MCwic2N5IjoiYXV0byIsIm5ldCI6IndzIiwidHlwZSI6Im5vbmUiLCJ0bHMiOiJ0bHMiLCJpZCI6Ijk2ZDIxY2ZlLWIyNjQtNGJmMy04MzQ5LWZiMDc2ZDQwODM3ZSIsInNuaSI6InNhbmpvc2UwMS56Z2pvay5jb20iLCJob3N0Ijoic2Fuam9zZTAxLnpnam9rLmNvbSIsInBhdGgiOiJcLyIsInNraXAtY2VydC12ZXJpZnkiOnRydWV9", "proto": "VMESS", "country": "🌍", "ping": 160, "alive": true, "source": "v2nodes"}, {"url": "vless://b24484be-a335-472c-8dff-060ccd2b8f3b@xn-dns.onlineblog.ir:2083?&security=tls&sni=xn-de.shakhle.ir.&type=ws&headerType=none&host=xn-de.shakhle.ir.&path=%2F#", "proto": "VLESS", "country": "🌍", "ping": 175, "alive": true, "source": "v2nodes"}, {"url": "trojan://BmVb9TGoytYhaLnZhkrVCtx8khbQFTA_@ch-2.bexum.fun:443?sni=ch-2.bexum.fun#", "proto": "TROJAN", "country": "🇧🇪", "ping": 181, "alive": true, "source": "v2nodes"}, {"url": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwdExWOXpKZDFyQ2dvRFFKY3llR0tSenNHRlBnLU5ZYg@87.120.187.107:9999#", "proto": "SS", "country": "🌍", "ping": 360, "alive": false, "source": "v2nodes"}, {"url": "vless://ce069292-c8bf-40dd-a6b1-87818a1e64e9@139.84.235.99:443?type=ws&encryption=none&host=1-jk1.pages.dev&path=%2F&headerType=none&quicSecurity=none&serviceName=&security=tls&flow=&fp=chrome&insecure=1&sni=1-jk1.pages.dev#", "proto": "VLESS", "country": "🇩🇪", "ping": 220, "alive": true, "source": "v2nodes"}, {"url": "vmess://eyJ2IjoiMiIsInBzIjoiXHVkODNjXHVkZGY4XHVkODNjXHVkZGVjW29wZW5wcm94eWxpc3QuY29tXSB2bWVzcy1TRyIsImFkZCI6InNnLTJ6YTNuLmtub3RpYy5zcGFjZSIsInBvcnQiOjQ0MywiYWlkIjowLCJzY3kiOiJhdXRvIiwibmV0Ijoid3MiLCJ0eXBlIjoibm9uZSIsInRscyI6InRscyIsImlkIjoiN2I3YzI4ZTQtZjU3MC00YjRlLWJhMzMtZmUyNzFkM2U2ODI4Iiwic25pIjoic2ctMnphM24ua25vdGljLnNwYWNlIiwiaG9zdCI6InNnLTJ6YTNuLmtub3RpYy5zcGFjZSIsInBhdGgiOiJcL2Rvd25sb2FkIiwic2tpcC1jZXJ0LXZlcmlmeSI6dHJ1ZX0=", "proto": "VMESS", "country": "🌍", "ping": 276, "alive": true, "source": "v2nodes"}, {"url": "ss://YWVzLTEyOC1nY206MGZhZTBjZWItNGI2ZC00YmFiLTlkM2MtNjEyYzc3YWU5YjJm@vip-pro6669cheap.fq-number-001.co:37769#", "proto": "SS", "country": "🌍", "ping": 326, "alive": false, "source": "v2nodes"}, {"url": "ss://YWVzLTEyOC1nY206MGZhZTBjZWItNGI2ZC00YmFiLTlkM2MtNjEyYzc3YWU5YjJm@vip-pro6669cheap.fq-number-001.co:25584#", "proto": "SS", "country": "🌍", "ping": 257, "alive": false, "source": "v2nodes"}, {"url": "vless://feca2089-d231-4f5f-9ec7-e745ab289518@sg.baqi.indevs.in:39001?&type=ws&headerType=none&host=d0a6b4d945dbfc846b18fade7d631883.mobgslb.tbcache.com&path=%2F#", "proto": "VLESS", "country": "🇮🇳", "ping": 312, "alive": false, "source": "v2nodes"}, {"url": "vless://75807638-6f19-1f40-ae08-38492ee85c88@cluster-europe-1.firstvideocdn.ru:52006?allowInsecure=1&sni=cluster-europe-1.firstvideocdn.ru&flow=xtls-rprx-vision-udp443&fp=chrome&security=tls#", "proto": "VLESS", "country": "🇷🇺", "ping": 229, "alive": false, "source": "v2nodes"}, {"url": "ss://YWVzLTI1Ni1nY206ZGFkYTEyMDM@13.36.173.59:80#", "proto": "SS", "country": "🌍", "ping": 373, "alive": false, "source": "v2nodes"}, {"url": "vmess://eyJ2IjoiMiIsInBzIjoiXHVkODNjXHVkZGVmXHVkODNjXHVkZGY1W29wZW5wcm94eWxpc3QuY29tXSB2bWVzcy1KUCIsImFkZCI6IjEwMy4xMDAuMTU4LjE4IiwicG9ydCI6MjkwMjUsImFpZCI6MCwic2N5IjoiYXV0byIsIm5ldCI6InRjcCIsInR5cGUiOiJub25lIiwidGxzIjoiIiwiaWQiOiJjNDVhYjYyZS01ZDI1LTQ4NmEtZjkxZS04MDdmZTRiOWMyM2YiLCJza2lwLWNlcnQtdmVyaWZ5Ijp0cnVlfQ==", "proto": "VMESS", "country": "🌍", "ping": 325, "alive": false, "source": "v2nodes"}, {"url": "trojan://telegram-id-privatevpns@13.38.179.226:22222?security=tls&alpn=http/1.1&headerType=none&type=tcp&sni=trojan.burgerip.co.uk#", "proto": "TROJAN", "country": "🇬🇧", "ping": 291, "alive": false, "source": "v2nodes"}, {"url": "ss://YWVzLTI1Ni1nY206ZGFkYTEyMDM@3.16.50.244:80#", "proto": "SS", "country": "🌍", "ping": 207, "alive": false, "source": "v2nodes"}, {"url": "vmess://eyJ2IjoiMiIsInBzIjoiXHVkODNjXHVkZGZhXHVkODNjXHVkZGY4W29wZW5wcm94eWxpc3QuY29tXSB2bWVzcy1VUyIsImFkZCI6InVzMDIuYmN0dW8udG9wIiwicG9ydCI6MTQ0MywiYWlkIjowLCJzY3kiOiJhdXRvIiwibmV0IjoidGNwIiwidHlwZSI6Im5vbmUiLCJ0bHMiOiIiLCJpZCI6IjMxODAxOTY4LTk4NzctNGVmNS1iZTg3LTU2NTAzYzM0YTY5ZCIsInNraXAtY2VydC12ZXJpZnkiOnRydWV9", "proto": "VMESS", "country": "🌍", "ping": 390, "alive": false, "source": "v2nodes"}];
         const PROTOCOL_COLORS = {"vmess": "#8b5cf6", "vless": "#06b6d4", "trojan": "#f59e0b", "ss": "#10b981", "unknown": "#6366f1"};
         const PROTOCOL_ICONS = {"vmess": "fa-bolt", "vless": "fa-feather", "trojan": "fa-shield-haltered", "ss": "fa-ghost", "unknown": "fa-cube"};
         let currentFilter = 'all';
         let chartInstance = null;
 
-        // ============ الترجمة ============
-        const translations = {
-            ar: {
-                counterLabel: '🔰 سيرفر Exclave نشط وجاهز',
-                copy: '📋 نسخ الرابط',
-                active: 'نشط',
-                inactive: 'خامل',
-                noServers: 'لا توجد سيرفرات Exclave متاحة حالياً',
-                statusAll: 'Exclave VPN Cloud',
-                toast: 'تم نسخ رابط Exclave بنجاح!',
-                qrTitle: '📱 امسح الكود',
-            },
-            en: {
-                counterLabel: '🔰 Active Exclave Servers',
-                copy: '📋 Copy Link',
-                active: 'Active',
-                inactive: 'Inactive',
-                noServers: 'No Exclave servers available',
-                statusAll: 'Exclave VPN Cloud',
-                toast: 'Exclave link copied!',
-                qrTitle: '📱 Scan QR',
-            }
-        };
-        let currentLang = 'ar';
-
-        function t(key) {
-            return translations[currentLang][key] || key;
-        }
-
-        // ============ Dark Mode ============
+        // Dark Mode
         const darkToggle = document.getElementById('dark-toggle');
         darkToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
-            const icon = darkToggle.querySelector('i');
-            if (document.body.classList.contains('dark')) {
-                icon.className = 'fas fa-sun';
-                localStorage.setItem('doka-exclave-dark', 'true');
-            } else {
-                icon.className = 'fas fa-moon';
-                localStorage.setItem('doka-exclave-dark', 'false');
-            }
+            darkToggle.querySelector('i').className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('doka-dark', document.body.classList.contains('dark') ? 'true' : 'false');
         });
-        if (localStorage.getItem('doka-exclave-dark') === 'true') {
+        if (localStorage.getItem('doka-dark') === 'true') {
             document.body.classList.add('dark');
             darkToggle.querySelector('i').className = 'fas fa-sun';
         }
 
-        // ============ عرض البطاقات ============
+        // عرض البطاقات
         function renderCards(filter) {
             const grid = document.getElementById('servers-grid');
             const noMsg = document.getElementById('no-servers');
-            const noMsgText = document.getElementById('no-servers-text');
-
-            const filtered = filter === 'all'
-                ? serversData
-                : serversData.filter(s => s.proto.toLowerCase() === filter);
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                noMsgText.innerText = t('noServers');
-                noMsg.style.display = 'block';
-                return;
-            }
-
+            let filtered = filter === 'all' ? serversData : serversData.filter(s => {
+                if (filter === 'v2nodes' || filter === 'exclave') return s.source === filter;
+                return s.proto.toLowerCase() === filter;
+            });
+            if (filtered.length === 0) { grid.innerHTML = ''; noMsg.style.display = 'block'; return; }
             noMsg.style.display = 'none';
-            const isActiveMap = new Map();
-
             let html = '';
-            filtered.forEach((server, i) => {
-                if (!isActiveMap.has(server.link)) {
-                    isActiveMap.set(server.link, Math.random() > 0.1);
-                }
-                const isActive = isActiveMap.get(server.link);
-                const shortLink = server.link.length > 70
-                    ? server.link.substring(0, 68) + '...'
-                    : server.link;
-                const protoColor = PROTOCOL_COLORS[server.proto.toLowerCase()] || '#6366f1';
-                const protoIcon = PROTOCOL_ICONS[server.proto.toLowerCase()] || 'fa-cube';
-                const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? t('active') : t('inactive');
-                const statusColor = isActive ? 'var(--success)' : 'var(--danger)';
-
+            filtered.forEach((s, i) => {
+                const short = s.url.length > 65 ? s.url.substring(0, 63)+'...' : s.url;
+                const protoColor = PROTOCOL_COLORS[s.proto.toLowerCase()] || '#6366f1';
+                const protoIcon = PROTOCOL_ICONS[s.proto.toLowerCase()] || 'fa-cube';
+                const alive = s.alive;
+                const pingDisplay = alive ? s.ping+'ms' : 'ميت';
+                const statusClass = alive ? 'status-alive' : 'status-dead';
+                const statusColor = alive ? 'var(--success)' : 'var(--danger)';
                 html += `
                 <div class="server-card">
                     <div class="server-card-header">
                         <div class="server-info">
-                            <span class="server-flag">${server.flag}</span>
-                            <span class="server-proto-badge" style="background:${protoColor}">
-                                <i class="fas ${protoIcon}"></i> ${server.proto}
-                            </span>
-                            <span class="server-status" style="color:${statusColor}">
-                                <span class="status-dot ${statusClass}"></span>
-                                ${statusText}
-                            </span>
+                            <span class="server-flag">${s.country}</span>
+                            <span class="server-proto-badge" style="background:${protoColor}"><i class="fas ${protoIcon}"></i> ${s.proto}</span>
+                            <span class="server-status" style="color:${statusColor}"><span class="status-dot ${statusClass}"></span> ${alive?'حي':'ميت'}</span>
+                            <span style="font-size:0.7rem; color:${s.source==='exclave'?'#a855f7':'var(--text-secondary)'};">${s.source==='exclave'?'⬡':''}</span>
                         </div>
-                        <span style="font-size:0.8rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px;">
-                            <i class="fas fa-tachometer-alt"></i> ${server.ping}ms
-                        </span>
+                        <span style="font-size:0.8rem; color:var(--text-secondary);">${pingDisplay}</span>
                     </div>
-                    <div class="server-url-box">${shortLink}</div>
+                    <div class="server-url-box">${short}</div>
                     <div class="server-actions">
-                        <button class="btn-copy" onclick="copyToClipboard('${server.link.replace(/'/g, "\'")}')" style="background:${protoColor}">
-                            <i class="far fa-copy"></i> ${t('copy')}
-                        </button>
-                        <button class="btn-qr" onclick="toggleQR('qr${i}', '${server.link.replace(/'/g, "\'")}')" title="${t('qrTitle')}">
-                            <i class="fas fa-qrcode"></i>
-                        </button>
+                        <button class="btn-copy" onclick="copyText('${s.url.replace(/'/g, "\'")}')" style="background:${protoColor}"><i class="far fa-copy"></i> نسخ</button>
+                        <button class="btn-qr" onclick="toggleQR('q${i}','${s.url.replace(/'/g, "\'")}')"><i class="fas fa-qrcode"></i></button>
                     </div>
-                    <div id="qr${i}" class="qr-container" style="display:none;"></div>
+                    <div class="qr-container" id="q${i}"></div>
                 </div>`;
             });
             grid.innerHTML = html;
         }
 
-        // ============ نسخ النص ============
-        window.copyToClipboard = (text) => {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast();
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.cssText = 'position:fixed;opacity:0;';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                showToast();
-            });
-        };
+        window.copyText = t => { navigator.clipboard.writeText(t).then(()=>{const toast=document.getElementById('toast');toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2500);}).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);const toast=document.getElementById('toast');toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2500);}); };
+        window.toggleQR = (id, link) => { const el = document.getElementById(id); if (el.style.display !== 'flex') { if (!el.innerHTML) new QRCode(el, {text:link, width:180, height:180, colorDark:'#1e293b', colorLight:'#ffffff'}); el.style.display = 'flex'; el.scrollIntoView({behavior:'smooth',block:'nearest'}); } else { el.style.display = 'none'; } };
 
-        function showToast() {
-            const toast = document.getElementById('toast');
-            toast.querySelector('span').innerText = t('toast');
-            toast.classList.add('show');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
-        }
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderCards(currentFilter);
+        }));
 
-        // ============ QR Code ============
-        window.toggleQR = (id, link) => {
-            const el = document.getElementById(id);
-            if (el.style.display === 'none') {
-                if (!el.innerHTML) {
-                    new QRCode(el, {
-                        text: link,
-                        width: 180,
-                        height: 180,
-                        colorDark: '#1e293b',
-                        colorLight: '#ffffff',
-                    });
-                }
-                el.style.display = 'flex';
-                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                el.style.display = 'none';
-            }
-        };
-
-        // ============ الفلترة ============
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderCards(currentFilter);
-            });
-        });
-
-        // ============ الإحصائيات ============
         document.getElementById('show-stats-btn').addEventListener('click', async () => {
-            document.querySelector('.navbar').style.display = 'none';
-            document.querySelector('.hero').style.display = 'none';
-            document.querySelector('.filter-section').style.display = 'none';
-            document.querySelector('.servers-section').style.display = 'none';
-            document.querySelector('footer').style.display = 'none';
-            document.getElementById('stats-page').style.display = 'block';
-
+            document.querySelector('.navbar').style.display='none';
+            document.querySelector('.hero').style.display='none';
+            document.querySelector('.filter-section').style.display='none';
+            document.querySelector('.servers-section').style.display='none';
+            document.querySelector('footer').style.display='none';
+            document.getElementById('stats-page').style.display='block';
             try {
                 const res = await fetch('stats.json');
-                if (!res.ok) throw new Error();
                 const stats = await res.json();
-                document.getElementById('stats-last-update').innerText =
-                    new Date(stats.last_updated).toLocaleString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-
+                document.getElementById('stats-last-update').innerText = new Date(stats.last_updated).toLocaleString('ar-SA');
                 const ctx = document.getElementById('stats-chart').getContext('2d');
-                if (chartInstance) chartInstance.destroy();
-
-                const labels = Object.keys(stats.by_protocol).map(p => p.toUpperCase());
-                const data = Object.values(stats.by_protocol);
-                const colors = labels.map(l => PROTOCOL_COLORS[l.toLowerCase()] || '#6366f1');
-
+                if(chartInstance) chartInstance.destroy();
+                const labels = Object.keys(stats.by_protocol).map(p=>p.toUpperCase());
                 chartInstance = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: colors,
-                            borderColor: document.body.classList.contains('dark') ? '#1a2332' : '#ffffff',
-                            borderWidth: 4,
-                            hoverBorderWidth: 6,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 20,
-                                    font: { family: 'Cairo', size: 14 },
-                                    color: document.body.classList.contains('dark') ? '#e2e8f0' : '#1e293b',
-                                }
-                            }
-                        },
-                    }
+                    type:'doughnut',
+                    data:{ labels, datasets:[{ data:Object.values(stats.by_protocol), backgroundColor:labels.map(l=>PROTOCOL_COLORS[l.toLowerCase()]||'#6366f1'), borderColor:document.body.classList.contains('dark')?'#1a2332':'#fff', borderWidth:4 }] },
+                    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ padding:20, font:{family:'Cairo',size:14} } } } }
                 });
-            } catch (err) {
-                console.error(err);
-                document.getElementById('stats-last-update').innerText = '—';
-            }
+            } catch(e) { console.error(e); }
         });
 
-        // ============ تحميل أولي ============
         renderCards('all');
-
-        console.log('%c⬡ DOKA EXCLAVE %cExclusive Edition %cReady',
-            'color:#6366f1;font-size:2rem;font-weight:900;',
-            'color:#a855f7;font-size:1rem;',
-            'color:#10b981;');
-        console.log('%cTotal: %c12 %cExclave servers loaded',
-            'color:#64748b;', 'color:#6366f1;font-weight:bold;', 'color:#64748b;');
+        console.log('%c🚀 DOKA PRO %cUltimate %cReady', 'color:#6366f1;font-size:2rem;font-weight:900;', 'color:#a855f7;', 'color:#10b981;');
+        console.log('%cTotal:%c 32 %cservers', 'color:#64748b;', 'color:#6366f1;font-weight:bold;', 'color:#64748b;');
     </script>
 </body>
 </html>
