@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-05-05T05:43:49.310171+00:00",
-  "total_servers": 29,
-  "v2nodes": 16,
+  "last_updated": "2026-05-05T08:09:30.642778+00:00",
+  "total_servers": 31,
+  "v2nodes": 18,
   "exclave": 13,
   "alive": 10,
   "by_protocol": {
+    "vless": 11,
     "trojan": 4,
-    "vless": 7,
     "unknown": 5,
-    "ss": 8,
-    "vmess": 5
+    "vmess": 5,
+    "ss": 6
   }
 }
