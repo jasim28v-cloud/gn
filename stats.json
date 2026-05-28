@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-05-28T10:00:42.974253+00:00",
+  "last_updated": "2026-05-28T15:53:43.167489+00:00",
   "total_servers": 30,
   "v2nodes": 20,
   "exclave": 10,
-  "alive": 15,
+  "alive": 14,
   "by_protocol": {
     "vless": 24,
     "trojan": 3,
