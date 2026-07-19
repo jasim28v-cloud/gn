@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-19T19:04:44.343289+00:00",
+  "last_updated": "2026-07-19T21:51:39.717358+00:00",
   "total_servers": 19,
   "v2nodes": 19,
   "exclave": 0,
@@ -7,7 +7,7 @@
   "by_protocol": {
     "ss": 1,
     "vless": 3,
-    "vmess": 1,
-    "trojan": 14
+    "trojan": 14,
+    "vmess": 1
   }
 }
